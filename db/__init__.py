@@ -21,7 +21,7 @@ class DatabaseCursor:
 
 
 def connect_db():
-    conn_string = "host='localhost' dbname='cs2102' user='vivek'"  # Get port and password from .pgpass file
+    conn_string = "host='localhost' dbname='<dbname>' user='<username>'"  # Get port and password from .pgpass file
     conn = psycopg2.connect(conn_string, cursor_factory=extras.DictCursor)
     return conn
 
@@ -29,7 +29,7 @@ def connect_db():
 def init_db():
     # Create database first if it doesn't exist
     # postgres is the default db and can be used temporarily to interact with the db server and get useful info
-    conn_string = "host='localhost' dbname='postgres' user='vivek'"
+    conn_string = "host='localhost' dbname='postgres' user='<username>'"
     conn = psycopg2.connect(conn_string)
 
     conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
