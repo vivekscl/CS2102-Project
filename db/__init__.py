@@ -21,15 +21,17 @@ class DatabaseCursor:
 
 
 def connect_db():
-    conn_string = open('conn.txt', 'r').read() # Get port and password from .pgpass file
+    conn_string = config[os.getenv("FLASK_CONFIG")].CONNECTION_FILE
     conn = psycopg2.connect(conn_string, cursor_factory=extras.DictCursor)
     return conn
 
 
 def init_db():
-    # Create database first if it doesn't exist
-    # postgres is the default db and can be used temporarily to interact with the db server and get useful info
-    conn_string = open('conn.txt', 'r').read()
+    """
+    Create database first if it doesn't exist
+    postgres is the default db and can be used temporarily to interact with the db server and get useful info
+    """
+    conn_string = config[os.getenv("FLASK_CONFIG")].CONNECTION_FILE
     conn = psycopg2.connect(conn_string)
 
     conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)

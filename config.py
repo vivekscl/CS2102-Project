@@ -12,6 +12,7 @@ class Config:
     DEBUG = False
     TESTING = False
     SCHEMA_LOCATION = os.environ.get('DEV_SCHEMA_LOCATION', os.path.join(basedir, 'db/schema.sql'))
+    CONNECTION_FILE = open('conn.txt', 'r').read()
 
     @staticmethod
     def init_app(app):
