@@ -26,7 +26,7 @@ def connect_db():
     return conn
 
 
-def init_db():
+def init_db(): ####Do I need to understand this function?
     """
     Create database first if it doesn't exist
     postgres is the default db and can be used temporarily to interact with the db server and get useful info
@@ -56,17 +56,17 @@ def insert_item(name, description, price):
     try:
         with DatabaseCursor() as cursor:
             cursor.execute('INSERT INTO items VALUES(%s, %s, %s);', (name, description, price))
-            current_app.logger.info("Item added to database: [{}, {}, {}]".format(name, description, price))
+            current_app.logger.info("Item added to database: [{}, {}, {}]".format(name, description, price)) #### What is this code doing?
             return True
-    except psycopg2.IntegrityError:
-        current_app.logger.info("INSERTION FAILED: [{}, {}, {}]".format(name, description, price))
+    except psycopg2.IntegrityError: 
+        current_app.logger.info("INSERTION FAILED: [{}, {}, {}]".format(name, description, price)) #### What is this code doing?
         return False
 
 
 def get_all_items():
     # Do note that the current_app can only be used within the context of a request, meaning that you can only use the
     # current_app variable if this method is being called during a request.
-    current_app.logger.info("Getting all items from database")
+    current_app.logger.info("Getting all items from database") #### What is this code doing?
     with DatabaseCursor() as cursor:
         cursor.execute('select * from items;')
         return cursor.fetchall()
