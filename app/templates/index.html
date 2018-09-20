@@ -65,9 +65,6 @@
                 contentType: 'application/json',
                 type: 'POST',
                 success: function(response) {
-                    if (response.redirect) {
-                        window.location.href = response.redirect;
-                    }
                     console.log(response);
                 },
                 error: function(error) {

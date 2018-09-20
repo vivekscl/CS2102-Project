@@ -57,16 +57,15 @@ def updateItem():
         oldItem = Item(**data['oldItem'])
         newItem = Item(**data['newItem'])
 
-        if form.validate_on_submit():
-            if not db.update_item(newItem.item_name, newItem.description, newItem.price, oldItem.item_name):
-                flash('Update failed!', "error")
-                app.logger.warning("Update failed")
-            else:
-                flash("Successfully updated an item!", "success")
+        if not db.update_item(newItem.item_name, newItem.description, newItem.price, oldItem.item_name):
+            flash('Update failed!', "error")
+            app.logger.warning("Update failed")
+        else:
+            flash("Successfully updated an item!", "success")
 
-            return jsonify(dict(redirect='index'))
+        return redirect(url_for('index'))
 
-    # return render_template('index.html', items=all_items, form=form, current_time=datetime.utcnow())
+    return render_template('index.html', items=all_items, form=form, current_time=datetime.utcnow())
 
     # return json.dumps({'status':'OK'})
 
