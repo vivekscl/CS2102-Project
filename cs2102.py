@@ -46,7 +46,7 @@ class Item:
         self.price = price
 
 
-@app.route('/updateItem', methods=['GET', 'POST'])
+@app.route('/updateItem', methods=['POST'])
 def updateItem():
     form = ItemForm()
     all_items = db.get_all_items()
