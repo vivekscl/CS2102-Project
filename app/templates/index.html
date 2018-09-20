@@ -16,7 +16,7 @@
             <h3>{{ item['itemname'] }}</h3>
             <h4>{{ item['price'] }}</h4>
             <p>{{ item['description'] }}</p>
-            <a href="#" class="btn btn-primary" role="button">Update</a>
+            <a href="#" class="btn btn-primary" role="button" onclick="populateForm({{ item }}); return false;">Update</a>
             <a href="#" class="btn btn-danger" role="button">Delete</a>
           </div>
         </div>
@@ -28,4 +28,61 @@
     <p>Local Date and Time: {{ moment(current_time).format('LLL') }}</p>
     <p>This was updated {{ moment(current_time).fromNow(refresh=True) }}</p>
 </div>
+
+<script>
+    function populateForm(item) {
+        var form = document.forms[0];
+        var save_button = document.createElement("input");
+        save_button.type = "button";
+        save_button.setAttribute("id", "saveBtn");
+        save_button.value = "Save Changes";
+        save_button.className = "btn btn-default";
+
+        // Updates the chosen item to the form
+        $('#item_name').val(item[0]);
+        $('#description').val(item[1]);
+        $('#price').val(item[2]);
+
+        // Get old item
+        var oldItem = {
+            "item_name": item[0],
+            "description": item[1],
+            "price": item[2]
+        };
+
+        if ($("#saveBtn").length == 0){
+          form.appendChild(save_button);
+        }
+
+
+        save_button.onclick = function() {
+            // Get new item
+            var newItem = {
+                "item_name": $('#item_name').val(),
+                "description": $('#description').val(),
+                "price": parseFloat($('#price').val())
+            }
+
+            var data = {};
+            data["oldItem"] = oldItem;
+            data["newItem"] = newItem;
+            console.log(data);
+
+            $.ajax({
+                url: "{{ url_for('updateItem') }}",
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                type: 'POST',
+                success: function(response) {
+                    console.log(response);
+                    save_button.remove();
+                    location.reload();
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+    }
+</script>
 {% endblock %}

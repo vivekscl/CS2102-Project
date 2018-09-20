@@ -62,6 +62,16 @@ def insert_item(name, description, price):
         current_app.logger.info("INSERTION FAILED: [{}, {}, {}]".format(name, description, price))
         return False
 
+def update_item(name, description, price, oldName):
+    try:
+        with DatabaseCursor() as cursor:
+            cursor.execute('UPDATE items SET itemname=%s, description=%s, price=%s WHERE itemname=%s',
+                           (name, description, price, oldName))
+            current_app.logger.info(name + " updated in database.")
+            return True
+    except psycopg2.IntegrityError:
+        current_app.logger.info("UPDATE FAILED")
+        return False
 
 def get_all_items():
     # Do note that the current_app can only be used within the context of a request, meaning that you can only use the
