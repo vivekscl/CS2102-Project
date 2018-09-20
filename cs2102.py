@@ -24,20 +24,7 @@ def index():
 
             return redirect(url_for('index'))
 
-
     return render_template('index.html', items=all_items, form=form, current_time=datetime.utcnow())
-
-# @app.route('/edit', methods=['GET'])
-# def edit_item():
-#     itemdict = {
-#         "name": "hello",
-#         "desc": "he",
-#         "price": 2.0
-#     }
-#     item = Item(**itemdict)
-#     form = ItemForm(obj=item)
-#     return render_template('index.html', form=form)
-#
 
 class Item:
     def __init__(self, item_name, description, price):
@@ -63,9 +50,6 @@ def updateItem():
         else:
             flash("Successfully updated an item!", "success")
 
-        return redirect(url_for('index'))
+    return json.dumps({'status': 'OK'})
 
-    return render_template('index.html', items=all_items, form=form, current_time=datetime.utcnow())
-
-    # return json.dumps({'status':'OK'})
 
