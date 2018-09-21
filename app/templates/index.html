@@ -17,7 +17,9 @@
             <h4>{{ item['price'] }}</h4>
             <p>{{ item['description'] }}</p>
             <a href="#" class="btn btn-primary" role="button" onclick="populateForm({{ item }}); return false;">Update</a>
-            <a href="#" class="btn btn-danger" role="button">Delete</a>
+            <form action="/delete/{{item['itemname']}}" method="post">
+              <button class="btn btn-danger" role="button">Delete</button> 
+            </form>
           </div>
         </div>
       </div>

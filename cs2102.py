@@ -26,6 +26,13 @@ def index():
 
     return render_template('index.html', items=all_items, form=form, current_time=datetime.utcnow())
 
+
+@app.route('/delete/<item_name>', methods=['POST'])
+def delete(item_name):
+    db.delete_item(item_name.rstrip())
+    return redirect(url_for('index'))
+
+  
 class Item:
     def __init__(self, item_name, description, price):
         self.item_name = item_name
@@ -51,5 +58,3 @@ def updateItem():
             flash("Successfully updated an item!", "success")
 
     return json.dumps({'status': 'OK'})
-
-
