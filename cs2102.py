@@ -1,8 +1,9 @@
 import os
 from app import create_app, ItemForm
 import db
-from flask import render_template, session, redirect, url_for, g, flash, request
+from flask import render_template, session, redirect, url_for, g, flash, request, jsonify
 from datetime import datetime
+import json
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 
@@ -20,11 +21,40 @@ def index():
                 app.logger.warning("Insert failed due to unique constraint")
             else:
                 flash("Successfully added an item!", "success")
+
             return redirect(url_for('index'))
 
     return render_template('index.html', items=all_items, form=form, current_time=datetime.utcnow())
+
 
 @app.route('/delete/<item_name>', methods=['POST'])
 def delete(item_name):
     db.delete_item(item_name.rstrip())
     return redirect(url_for('index'))
+
+  
+class Item:
+    def __init__(self, item_name, description, price):
+        self.item_name = item_name
+        self.description = description
+        self.price = price
+
+
+@app.route('/updateItem', methods=['POST'])
+def updateItem():
+    form = ItemForm()
+    all_items = db.get_all_items()
+
+    if request.method == 'POST':
+        data = request.get_json()
+
+        oldItem = Item(**data['oldItem'])
+        newItem = Item(**data['newItem'])
+
+        if not db.update_item(newItem.item_name, newItem.description, newItem.price, oldItem.item_name):
+            flash('Update failed!', "error")
+            app.logger.warning("Update failed")
+        else:
+            flash("Successfully updated an item!", "success")
+
+    return json.dumps({'status': 'OK'})
