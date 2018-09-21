@@ -23,3 +23,8 @@ def index():
             return redirect(url_for('index'))
 
     return render_template('index.html', items=all_items, form=form, current_time=datetime.utcnow())
+
+@app.route('/delete/<item_name>', methods=['POST'])
+def delete(item_name):
+    db.delete_item(item_name.rstrip())
+    return redirect(url_for('index'))
