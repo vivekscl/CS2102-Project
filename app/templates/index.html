@@ -17,7 +17,7 @@
             <h4>{{ item['price'] }}</h4>
             <p>{{ item['description'] }}</p>
             <a href="#" class="btn btn-primary" role="button" onclick="populateForm({{ item }}); return false;">Update</a>
-            <form action="/delete/{{item['itemname']}}" method="post">
+            <form action="/delete/{{item['itemname']}}" method="post" class="pull-left">
               <button class="btn btn-danger" role="button">Delete</button> 
             </form>
           </div>
@@ -77,7 +77,6 @@
                 type: 'POST',
                 success: function(response) {
                     console.log(response);
-                    alert("Successfully updated item!");
                     location.reload();
                 },
                 error: function(error) {

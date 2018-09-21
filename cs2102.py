@@ -43,7 +43,7 @@ class Item:
 @app.route('/updateItem', methods=['POST'])
 def updateItem():
     form = ItemForm()
-    all_items = db.get_all_items()
+    all_items = db.get_all_items() # dont need this actually...
 
     if request.method == 'POST':
         data = request.get_json()
@@ -52,9 +52,9 @@ def updateItem():
         newItem = Item(**data['newItem'])
 
         if not db.update_item(newItem.item_name, newItem.description, newItem.price, oldItem.item_name):
-            flash('Update failed!', "error")
+            flash('That item already exists! Try again!', "error")
             app.logger.warning("Update failed")
         else:
             flash("Successfully updated an item!", "success")
 
-    return json.dumps({'status': 'OK'})
+    return json.dumps({'status': 'OK'}) # this actually a backend sending data to a frontend
