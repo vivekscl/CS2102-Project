@@ -1,13 +1,16 @@
 from flask import Flask
+from flask_login import LoginManager
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from config import config
-from app.forms import ItemForm
+from app.forms import ItemForm, LoginForm, SignUpForm
 from db import init_db
 import os
 
 bootstrap = Bootstrap()
 moment = Moment()
+login_manager = LoginManager()
+login_manager.login_view = 'login'
 
 
 def create_app(config_name):
@@ -23,6 +26,7 @@ def create_app(config_name):
 
     bootstrap.init_app(app)
     moment.init_app(app)
+    login_manager.init_app(app)
 
     # Since the flask app runs twice when it's reloaded, we use this to run expensive operations only once.
     if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":

@@ -50,36 +50,3 @@ def init_db():
     # Create tables from schema.sql
     with DatabaseCursor() as cursor:
         cursor.execute(open(Config.SCHEMA_LOCATION, "r").read())
-
-
-def insert_item(name, description, price):
-    try:
-        with DatabaseCursor() as cursor:
-            cursor.execute('INSERT INTO items VALUES(%s, %s, %s);', (name, description, price))
-            current_app.logger.info("Item added to database: [{}, {}, {}]".format(name, description, price)) 
-            return True
-    except psycopg2.IntegrityError: 
-        current_app.logger.info("INSERTION FAILED: [{}, {}, {}]".format(name, description, price)) 
-        return False
-
-def update_item(name, description, price, oldName):
-    try:
-        with DatabaseCursor() as cursor:
-            cursor.execute('UPDATE items SET itemname=%s, description=%s, price=%s WHERE itemname=%s', (name, description, price, oldName))
-            current_app.logger.info(name + " updated in database.")
-            return True
-    except psycopg2.IntegrityError:
-        current_app.logger.info("UPDATE FAILED")
-        return False
-
-def get_all_items():
-    # Do note that the current_app can only be used within the context of a request, meaning that you can only use the
-    # current_app variable if this method is being called during a request.
-    current_app.logger.info("Getting all items from database") 
-    with DatabaseCursor() as cursor:
-        cursor.execute('select * from items;')
-        return cursor.fetchall()
-
-def delete_item(item_name):
-    with DatabaseCursor() as cursor:
-        cursor.execute('DELETE FROM items WHERE itemname=%s', (item_name,))
