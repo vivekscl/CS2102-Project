@@ -3,7 +3,6 @@ from psycopg2 import extras
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from config import config, Config
 import os
-from flask import current_app
 
 
 class DatabaseCursor:

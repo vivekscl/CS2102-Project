@@ -1,12 +1,10 @@
 import os
-from app import create_app, ItemForm, LoginForm, SignUpForm, login_manager
+from app import create_app, LoginForm, SignUpForm, login_manager
 from flask_login import login_required, logout_user, login_user
-import db
 from models import user as UserModel
 from werkzeug.security import generate_password_hash
 from flask import render_template, redirect, url_for, g, flash, request
 from datetime import datetime
-import json
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 
@@ -74,7 +72,12 @@ def register():
     return render_template('register.html', form=form)
 
 
-@app.route('/', methods=['GET', 'POST'])
-@login_required
+@app.route('/', methods=['GET'])
 def index():
     return render_template('index.html', current_time=datetime.utcnow())
+
+
+@app.route('/user', methods=['GET'])
+@login_required
+def user_page():
+    return render_template('user.html', current_time=datetime.utcnow())
