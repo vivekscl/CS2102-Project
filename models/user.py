@@ -5,12 +5,12 @@ from werkzeug.security import check_password_hash
 
 class User(UserMixin):
 
-    def __init__(self, id, username, name, password_hash, phoneno=None):
+    def __init__(self, id, username, name, password_hash, phone_no=None):
         self.id = id
         self.username = username
         self.name = name
         self.password_hash = password_hash
-        self.phoneno = phoneno
+        self.phone_no = phone_no
 
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
@@ -26,7 +26,7 @@ class User(UserMixin):
         Creates a user by inserting that user into the table using the attributes of the User object
         :return:
         """
-        user_queries.insert_user(self.username, self.name, self.password_hash, self.phoneno)
+        user_queries.insert_user(self.username, self.name, self.password_hash, self.phone_no)
 
 
 # Keep only update and insert queries inside the User class for the convenience of using the User attributes.

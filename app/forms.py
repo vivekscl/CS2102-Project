@@ -32,7 +32,7 @@ class SignUpForm(FlaskForm):
     password = PasswordField("Password:", validators=[DataRequired(), EqualTo('confirm_password',
                                                                               message='Passwords must match')])
     confirm_password = PasswordField("Confirm Password:", validators=[DataRequired()])
-    phonenumber = StringField("Phone Number (optional): ", validators=[DataRequired(), Length(8)])
+    phonenumber = StringField("Phone Number (optional): ", validators=[Optional(), Length(8)])
     submit = SubmitField("Sign Up")
 
     def validate_username(self, field):

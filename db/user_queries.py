@@ -19,13 +19,13 @@ def get_user_by_username(username):
         return cursor.fetchone()
 
 
-def insert_user(username, name, password, phoneno=None):
+def insert_user(username, name, password, phone_no=None):
     try:
         with DatabaseCursor() as cursor:
-            cursor.execute('INSERT INTO users VALUES(DEFAULT, %s, %s, %s, %s);', (username, name, password, phoneno))
+            cursor.execute('INSERT INTO users VALUES(DEFAULT, %s, %s, %s, %s);', (username, name, password, phone_no))
             current_app.logger.info("User added to database: [{}, {}, {}, {}]"
-                                    .format(username, name, password, phoneno))
+                                    .format(username, name, password, phone_no))
             return True
     except psycopg2.IntegrityError:
-        current_app.logger.info("INSERTION FAILED: [{}, {}, {}]".format(username, name, password, phoneno))
+        current_app.logger.info("INSERTION FAILED: [{}, {}, {}]".format(username, name, password, phone_no))
         return False
