@@ -1,3 +1,5 @@
+SET timezone = 'Asia/Singapore';
+
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
 	username VARCHAR(128) UNIQUE NOT NULL,
@@ -12,8 +14,8 @@ CREATE TABLE IF NOT EXISTS listing (
 	name VARCHAR(128) NOT NULL,
 	description VARCHAR(512),
 	is_available VARCHAR(5) NOT NULL,
-    	FOREIGN KEY (owner_id) REFERENCES users(user_id),
-	CHECK (is_available='TRUE' OR is_available='FALSE')
+    	FOREIGN KEY (owner_id) REFERENCES users(id),
+	CHECK (is_available='true' OR is_available='false')
 );
 
 CREATE TABLE IF NOT EXISTS bid (
@@ -21,7 +23,7 @@ CREATE TABLE IF NOT EXISTS bid (
 	listing_id INTEGER,
 	bid_date TIMESTAMP,
 	price NUMERIC NOT NULL,
-	FOREIGN KEY (bidder_id) REFERENCES users(user_id) ON DELETE CASCADE,
+	FOREIGN KEY (bidder_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (listing_id) REFERENCES listing(listing_id) ON DELETE CASCADE,
 	PRIMARY KEY (bidder_id, listing_id, bid_date),
 	CHECK (price >= 0)
