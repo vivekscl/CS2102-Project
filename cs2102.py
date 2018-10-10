@@ -75,7 +75,7 @@ def register():
 
 @app.route('/', methods=['GET'])
 def index():
-    all_listings = listing_model.get_all_listings()
+    all_listings = listing_model.get_all_listings()fdfs
     top_listings = listing_model.get_top_listings()
     return render_template('index.html', current_time=datetime.utcnow(),listings=all_listings, t_listings=top_listings)
 
