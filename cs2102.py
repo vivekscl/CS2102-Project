@@ -5,6 +5,7 @@ from models import user as user_model, listing as listing_model, bid as bid_mode
 from werkzeug.security import generate_password_hash
 from flask import render_template, redirect, url_for, g, flash, request
 from datetime import datetime
+from db import DatabaseCursor
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 
@@ -74,7 +75,9 @@ def register():
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('index.html', current_time=datetime.utcnow())
+    all_listings = listing_model.get_all_listings()
+    top_listings = listing_model.get_top_listings()
+    return render_template('index.html', current_time=datetime.utcnow(),listings=all_listings, t_listings=top_listings)
 
 
 @app.route('/user', methods=['GET'])

@@ -1,5 +1,5 @@
 from db import listing_queries
-
+from db import DatabaseCursor
 
 class Listing:
 
@@ -42,3 +42,31 @@ def get_listings_under_owner(owner_id):
     if rows is None:
         return None
     return [Listing(**row) for row in rows]
+
+def get_all_listings():
+    with DatabaseCursor() as cursor:
+        cursor.execute('''select * 
+                          from listing''')
+        result = cursor.fetchall()
+    return result
+
+def get_listings_owner_id():
+    with DatabaseCursor() as cursor:
+        cursor.execute('''select * 
+                          from listing l 
+                          order by l.owner_id''')
+        result=cursor.fetchall()
+    return result
+
+def get_top_listings():
+    with DatabaseCursor() as cursor:
+        cursor.execute('''select l.name, l.is_available
+                          from listing l , bid b 
+                          where l.listing_id = b.listing_id
+                          group by l.name, l.is_available
+                          order by max(price) desc''')
+        result = cursor.fetchall()
+        if len(result)<=3:
+            return result
+        else:
+            return result[0:3]

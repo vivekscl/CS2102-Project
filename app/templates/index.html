@@ -2,6 +2,23 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 {% block page_content %}
+<style>
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+</style>
 
 <div class="jumbotron background-blue">
     <h1>Landing Page Here</h1>
@@ -9,6 +26,37 @@
 
 <div class="container">
     <h2>Most Popular Items</h2>
+  <table>
+  <tr>
+    <th>Item_name</th>
+    <th>Is_available</th>
+  </tr>
+
+  {% for listing in t_listings %}
+  
+  <tr>
+    <td>{{listing[0]}}</td>
+    <td>{{listing[1]}}</td>
+  </tr>
+  {%- endfor %}
+</table>
+
+    <h2>All Items </h2>
+<table>
+  <tr>
+    <th>Item_name</th>
+    <th>Is_available</th>
+  </tr>
+
+  {% for listing in listings %}
+  
+  <tr>
+    <td>{{listing[2]}}</td>
+    <td>{{listing[4]}}</td>
+  </tr>
+  {%- endfor %}
+</table>
+
 </div>
 
 <div>
@@ -17,3 +65,4 @@
 </div>
 
 {% endblock %}
+
