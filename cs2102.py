@@ -75,9 +75,10 @@ def register():
 
 @app.route('/', methods=['GET'])
 def index():
-    all_listings = listing_model.get_all_listings()fdfs
-    top_listings = listing_model.get_top_listings()
-    return render_template('index.html', current_time=datetime.utcnow(),listings=all_listings, t_listings=top_listings)
+    all_listings = listing_model.get_all_listings()
+    expensive_listings = listing_model.get_expensive_listings()
+    popular_listings = listing_model.get_popular_listings()
+    return render_template('index.html', current_time=datetime.utcnow(), e_listings=expensive_listings, p_listings=popular_listings)
 
 
 @app.route('/user', methods=['GET'])

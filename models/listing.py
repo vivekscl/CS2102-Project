@@ -58,15 +58,32 @@ def get_listings_owner_id():
         result=cursor.fetchall()
     return result
 
-def get_top_listings():
+number = 5
+
+# extract top 'number' listings if there exists
+def get_expensive_listings():
     with DatabaseCursor() as cursor:
-        cursor.execute('''select l.name, l.is_available
+        cursor.execute('''select l.name, l.is_available , max(price)
                           from listing l , bid b 
                           where l.listing_id = b.listing_id
                           group by l.name, l.is_available
                           order by max(price) desc''')
         result = cursor.fetchall()
-        if len(result)<=3:
+        if len(result)<= number:
             return result
         else:
-            return result[0:3]
+            return result[0:number]
+
+# extract top 'number' listings if there exists
+def get_popular_listings():
+    with DatabaseCursor() as cursor:
+        cursor.execute('''select l.name, l.is_available, count(*)
+                          from listing l, bid b
+                          where l.listing_id = b.listing_id
+                          group by l.name, l.is_available
+                          order by count(*) desc''')
+        result = cursor.fetchall()
+        if len(result)<=number:
+            return result
+        else:
+            return result[0:number]
