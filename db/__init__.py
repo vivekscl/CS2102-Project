@@ -3,7 +3,6 @@ from psycopg2 import extras
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from config import config, Config
 import os
-from flask import current_app
 
 
 class DatabaseCursor:
@@ -26,7 +25,7 @@ def connect_db():
     return conn
 
 
-def init_db():
+def init_db(): 
     """
     Create database first if it doesn't exist
     postgres is the default db and can be used temporarily to interact with the db server and get useful info
@@ -50,24 +49,3 @@ def init_db():
     # Create tables from schema.sql
     with DatabaseCursor() as cursor:
         cursor.execute(open(Config.SCHEMA_LOCATION, "r").read())
-
-
-def insert_item(name, description, price):
-    try:
-        with DatabaseCursor() as cursor:
-            cursor.execute('INSERT INTO items VALUES(%s, %s, %s);', (name, description, price))
-            current_app.logger.info("Item added to database: [{}, {}, {}]".format(name, description, price))
-            return True
-    except psycopg2.IntegrityError:
-        current_app.logger.info("INSERTION FAILED: [{}, {}, {}]".format(name, description, price))
-        return False
-
-
-def get_all_items():
-    # Do note that the current_app can only be used within the context of a request, meaning that you can only use the
-    # current_app variable if this method is being called during a request.
-    current_app.logger.info("Getting all items from database")
-    with DatabaseCursor() as cursor:
-        cursor.execute('select * from items;')
-        return cursor.fetchall()
-
