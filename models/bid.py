@@ -53,3 +53,7 @@ def dict_list_to_bid_list(rows):
 
 def delete_all_bids_of_listing_not_under_bidder(listing_id, bidder_id):
     bid_queries.delete_all_bids_of_listing_not_under_bidder(listing_id, bidder_id)
+
+
+def delete_bids_of_listing(listing_id):
+    bid_queries.delete_bids_of_listing(listing_id)

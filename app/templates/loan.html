@@ -18,7 +18,14 @@
         <p>Borrowed On: {{ loan.borrow_date }}</p>
         <p>Borrowed From: {{ loan.pickup_loc }}</p>
         <p>Will be return at: {{ loan.return_loc }} on {{ moment(loan.return_date).format('LLL') }}</p>
+{#          <button class="media-bottom btn btn-danger">Return</button>#}
       </div>
+    </div>
+    <div>
+        <form action="{{ url_for('loan_details', listing_id=loan.listing_id) }}" method="post">
+            <button type="submit" class="btn btn-danger btn-lg btn-block" data-toggle="modal" data-target="#bidModal">
+                Return</button>
+        </form>
     </div>
 
 {% endblock %}

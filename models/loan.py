@@ -27,8 +27,13 @@ def get_loans_under_bidder(bidder_id):
         return None
     return [Loan(**row) for row in rows]
 
+
 def get_loan_of_listing(listing_id):
     row = loan_queries.get_loan_of_listing(listing_id)
     if row is None:
         return None
     return Loan(**row)
+
+
+def delete_loan_of_listing(listing_id):
+    loan_queries.delete_loan_of_listing(listing_id)

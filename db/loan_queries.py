@@ -32,3 +32,10 @@ def get_loan_of_listing(listing_id):
         current_app.logger.info("Getting loan with listing ID {} from database".format(listing_id))
         cursor.execute('select * from loan where listing_id = %s;', (listing_id,))
         return cursor.fetchone()
+
+
+def delete_loan_of_listing(listing_id):
+    with DatabaseCursor() as cursor:
+        current_app.logger.info("Deleting loan with listing ID {} from database"
+                                .format(listing_id))
+        cursor.execute("delete from loan where listing_id = %s", (listing_id,))

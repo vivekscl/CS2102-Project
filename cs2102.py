@@ -109,6 +109,9 @@ def listing_details(listing_id):
     The route shows the listing details of the given listing ID
     :param listing_id:
     """
+    if listing_model.get_listing_by_id(listing_id).is_available == 'false':
+        flash("That listing is out for loan and not available for bidding", "error")
+        return redirect(url_for('index'))
     form = BidForm()
     bids = bid_model.get_bids_under_listing(listing_id)
     # check if avail is false then redirect depending on whether the user is the owner or not
@@ -146,7 +149,7 @@ def generate_loan(bidder_id, listing_id, listing_name):
         borrow_date = datetime.now()
         return_date = datetime.combine(form.return_date.data, datetime.now().time())
         loan_model.Loan(bidder_id, listing_id, bid_date, borrow_date, return_date, form.return_loc.data,
-                        form.pickup_loc.data).create_loan()
+                        form.pickup_loc.data).create_loan()  # check if loan was created and flash success
         bid_model.delete_all_bids_of_listing_not_under_bidder(listing_id, bidder_id)
         listing_model.get_listing_by_id(listing_id).update_listing(is_available=False)
         return redirect(url_for('loan_details', listing_id=listing_id))
@@ -156,5 +159,11 @@ def generate_loan(bidder_id, listing_id, listing_name):
 @app.route('/loan/<int:listing_id>', methods=['GET', 'POST'])
 @login_required
 def loan_details(listing_id):
+    if request.method == 'POST':
+        loan_model.delete_loan_of_listing(listing_id)
+        bid_model.delete_bids_of_listing(listing_id)
+        listing_model.get_listing_by_id(listing_id).update_listing(is_available=True)
+        flash("Loan returned", "success")
+        return redirect(url_for('index'))
     current_loan = loan_model.get_loan_of_listing(listing_id)  # Need to check if None Type
     return render_template('loan.html', loan=current_loan)

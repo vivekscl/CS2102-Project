@@ -62,3 +62,10 @@ def delete_all_bids_of_listing_not_under_bidder(listing_id, bidder_id):
         current_app.logger.info("Deleting bids with listing ID {} that do not belong to bidder {} from database"
                                 .format(listing_id, bidder_id))
         cursor.execute("delete from bid where listing_id = %s and bidder_id <> %s", (listing_id, bidder_id))
+
+
+def delete_bids_of_listing(listing_id):
+    with DatabaseCursor() as cursor:
+        current_app.logger.info("Deleting bids with listing ID {} from database"
+                                .format(listing_id))
+        cursor.execute("delete from bid where listing_id = %s", (listing_id,))
