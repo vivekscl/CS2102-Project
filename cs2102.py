@@ -1,12 +1,10 @@
 import os
-from app import create_app, ItemForm, LoginForm, SignUpForm, login_manager
+from app import create_app, LoginForm, SignUpForm, login_manager
 from flask_login import login_required, logout_user, login_user
-import db
-from models import user as UserModel
+from models import user as user_model, listing as listing_model, bid as bid_model
 from werkzeug.security import generate_password_hash
 from flask import render_template, redirect, url_for, g, flash, request
 from datetime import datetime
-import json
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 
@@ -19,7 +17,7 @@ def load_user(user_id):
     :param user_id:
     :return: User who's id his the given id
     """
-    return UserModel.get_user_by_id(user_id)
+    return user_model.get_user_by_id(user_id)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -31,7 +29,7 @@ def login():
     """
     form = LoginForm()
     if request.method == 'POST' and form.validate_on_submit():
-        user = UserModel.get_user_by_username(form.username.data)
+        user = user_model.get_user_by_username(form.username.data)
 
         if user is not None and user.verify_password(form.password.data):
             login_user(user, form.remember_me.data)
@@ -66,16 +64,15 @@ def register():
     """
     form = SignUpForm()
     if request.method == 'POST' and form.validate_on_submit():
-        user = UserModel.User(None, form.username.data, form.name.data,
-                              generate_password_hash(form.password.data), form.phonenumber.data)
+        user = user_model.User(None, form.username.data, form.name.data,
+                               generate_password_hash(form.password.data), form.phonenumber.data)
         user.create_user()
         flash("You can now login", "success")
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
 
-@app.route('/', methods=['GET', 'POST'])
-@login_required
+@app.route('/', methods=['GET'])
 def index():
     form = ItemForm()
     all_items = db.get_all_items()
@@ -117,3 +114,21 @@ def updateItem():
             flash("Successfully updated an item!", "success")
 
     return render_template('index.html', current_time=datetime.utcnow())
+
+
+@app.route('/user', methods=['GET'])
+@login_required
+def user_page():
+    return render_template('user.html', current_time=datetime.utcnow())
+
+
+@app.route('/listing/<int:listing_id>', methods=['GET'])
+def listing_details(listing_id):
+    """
+    The route shows the listing details of the given listing ID
+    :param listing_id:
+    """
+    listing = listing_model.get_listing_by_id(listing_id)
+    bids = bid_model.get_bids_under_listing(listing_id)
+    owner = user_model.get_user_by_id(listing.owner_id)
+    return render_template('listing.html', listing=listing, bids_under_this_listing=bids, owner=owner)
