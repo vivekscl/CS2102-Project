@@ -3,15 +3,68 @@
 
 {% block page_content %}
 
-<div class="jumbotron background-blue">
-    <h1>Here are your current listings!</h1>
-    <p>If there isn't any, click the button below to add one!</p>
-    <p><a class="btn btn-primary btn-lg" href="#" role="button">Add Listing</a></p>
-</div>
+    <div class="container">
+        <div class="page-header">
+            <h1 id="title1">Available For Bidding</h1>
+        </div>
+        <div class="row">
+            <div id="listings" class="col-md-8 list-group">
+                {% for listing in available %}
+                    <a href="{{ url_for('listing_details', listing_id=listing.listing_id) }}" class="list-group-item">
+                        Name:{{ listing.name }}, Tag:Book</a>
+                {% endfor %}
+            </div>
 
-<div>
-    <p>Local Date and Time: {{ moment(current_time).format('LLL') }}</p>
-    <p>This was updated {{ moment(current_time).fromNow(refresh=True) }}</p>
-</div>
+            <div id="loans" class="col-md-8 list-group" style="display:none">
+                {% for listing in loans %}
+                    {# to do #}
+                {% endfor %}
+            </div>
+
+            <div class="col-md-4 btn-toolbar-vertical">
+                <button type="button" class="btn btn-default btn-lg btn-block" value="My Listings">My Listings</button>
+                <button type="button" class="btn btn-default btn-lg btn-block" value="My Loans">My Loans</button>
+                <button type="button" class="btn btn-default btn-lg btn-block"
+                        onclick="window.location.href='{{ url_for('create_listing') }}';">Add New Listing
+                </button>
+            </div>
+        </div>
+
+        <div id="sub-content">
+            <div class="page-header">
+                <h1 id="title2">Not Available For Bidding</h1>
+            </div>
+            <div class="row">
+                <div class="col-md-8 list-group">
+                    {% for listing in not_available %}
+                        <a href="{{ url_for('listing_details', listing_id=listing.listing_id) }}"
+                           class="list-group-item">
+                            Name:{{ listing.name }}, Tag:Book</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+             $("button").click(function() {
+                 var button_val = $(this).val();
+                 if (button_val != "My Listings") {   // My Loans
+                     $('#title1').text(button_val);
+                     $('#sub-content').hide();
+                     $('#listings').hide();
+                     $('#loans').show();
+                 } else {   // My Listings
+                     $('#title1').text("Available For Bidding");
+                     $('#loans').hide();
+                     $('#listings').show();
+                     $('#sub-content').show();
+                 }
+             });
+        });
+    </script>
 
 {% endblock %}
+

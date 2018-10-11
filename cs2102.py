@@ -1,13 +1,12 @@
 import os
-from app import create_app, LoginForm, SignUpForm, login_manager
-from flask_login import login_required, logout_user, login_user
-from models import user as user_model, listing as listing_model, bid as bid_model
+from app import create_app, ItemForm, LoginForm, SignUpForm, login_manager
+from flask_login import login_required, logout_user, login_user, current_user
+from models import user as user_model, listing as listing_model, bid as bid_model, loan as loan_model
 from werkzeug.security import generate_password_hash
 from flask import render_template, redirect, url_for, g, flash, request
 from datetime import datetime
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
-
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -74,53 +73,45 @@ def register():
 
 @app.route('/', methods=['GET'])
 def index():
-    form = ItemForm()
-    all_items = db.get_all_items()
-
-    # If a post request is sent, validate the form and insert the item into db
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            if not db.insert_item(form.item_name.data, form.description.data, form.price.data):
-                flash('That item already exists! Try another one!', "error")
-                app.logger.warning("Insert failed due to unique constraint")
-            else:
-                flash("Successfully added an item!", "success")
-            return redirect(url_for('index'))
-
-    return render_template('index.html', items=all_items, form=form, current_time=datetime.utcnow())
-
-class Item:
-    def __init__(self, item_name, description, price):
-        self.item_name = item_name
-        self.description = description
-        self.price = price
-
-
-@app.route('/updateItem', methods=['POST'])
-def updateItem():
-    form = ItemForm()
-    all_items = db.get_all_items()
-
-    if request.method == 'POST':
-        data = request.get_json()
-
-        oldItem = Item(**data['oldItem'])
-        newItem = Item(**data['newItem'])
-
-        if not db.update_item(newItem.item_name, newItem.description, newItem.price, oldItem.item_name):
-            flash('Update failed!', "error")
-            app.logger.warning("Update failed")
-        else:
-            flash("Successfully updated an item!", "success")
-
     return render_template('index.html', current_time=datetime.utcnow())
 
 
 @app.route('/user', methods=['GET'])
 @login_required
 def user_page():
-    return render_template('user.html', current_time=datetime.utcnow())
+    listings = listing_model.get_listings_under_owner(current_user.id)
+    loans = loan_model.get_loans_under_bidder(current_user.id)
+    available = []
+    not_available = []
 
+    print(loans)
+    for listing in listings:
+        if listing.is_available == 'true':
+            available.append(listing)
+        else:
+            not_available.append(listing)
+
+    return render_template('user.html', available=available, not_available=not_available, loans=loans)
+
+@app.route('/listing/create', methods=['GET', 'POST'])
+@login_required
+def create_listing():
+
+    form = ItemForm()
+
+    # If a post request is sent, validate the form and insert the listing into the db using listing_model
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            listing = listing_model.Listing(None, current_user.id, form.item_name.data, form.description.data)
+            if listing.create_listing():
+                flash("New listing added!", "success")
+                return redirect(url_for('index'))
+            else:
+                flash('Unable to add the listing!', "error")
+                app.logger.warning("Insert failed") # to-do provide error msg for diff insertion error
+
+
+    return render_template('create_listing.html', form=form, current_time=datetime.utcnow())
 
 @app.route('/listing/<int:listing_id>', methods=['GET'])
 def listing_details(listing_id):
