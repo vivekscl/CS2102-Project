@@ -25,3 +25,10 @@ def insert_loan(bidder_id, listing_id, bid_date, borrow_date, return_date, retur
                                  .format(bidder_id, listing_id, bid_date, borrow_date, return_date, return_loc,
                                          pickup_loc))
         return False
+
+
+def get_loan_of_listing(listing_id):
+    with DatabaseCursor() as cursor:
+        current_app.logger.info("Getting loan with listing ID {} from database".format(listing_id))
+        cursor.execute('select * from loan where listing_id = %s;', (listing_id,))
+        return cursor.fetchone()

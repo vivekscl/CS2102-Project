@@ -3,7 +3,7 @@ from flask_login import LoginManager
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from config import config
-from app.forms import ItemForm, LoginForm, SignUpForm
+from app.forms import ItemForm, LoginForm, SignUpForm, BidForm, GenerateLoanForm
 from db import init_db
 import os
 
