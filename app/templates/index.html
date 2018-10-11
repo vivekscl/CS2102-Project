@@ -4,7 +4,34 @@
 {% block page_content %}
 
 <div class="jumbotron background-blue">
-    <h1>Landing Page Here</h1>
+    <h1>Welcome to Stuff Sharing Platform!</h1>
+</div>
+
+<!--Search Fields-->
+<div class="input-group">
+    <div class="input-group-btn search-panel">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <span id="search_concept">Filter by</span> <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+          <li><a href="#item">Item</a></li>
+          <li><a href="#owner">Owner</a></li>
+          <li><a href="#tag">Tag</a></li>
+        </ul>
+    </div>
+    <input type="hidden" name="search_param" value="all" id="search_param">
+    <input type="text" class="form-control" name="x" placeholder="Search term...">
+    <span class="input-group-btn">
+        <button class="btn btn-default" type="button">
+            <span class="glyphicon glyphicon-search"></span>
+        </button>
+    </span>
+</div>
+<div>
+    <h4> Search By Tag </h4>
+    {{ wtf.quick_form(form) }}
+    <h4> Search By Owner </h4>
+    {{ wtf.quick_form(form2) }}
 </div>
 
 <div class="container">
@@ -15,5 +42,20 @@
     <p>Local Date and Time: {{ moment(current_time).format('LLL') }}</p>
     <p>This was updated {{ moment(current_time).fromNow(refresh=True) }}</p>
 </div>
+
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+
+<script>
+    $(document).ready(function(e){
+    $('.search-panel .dropdown-menu').find('a').click(function(e) {
+        e.preventDefault();
+        var param = $(this).attr("href").replace("#","");
+        var concept = $(this).text();
+        $('.search-panel span#search_concept').text(concept);
+        $('.input-group #search_param').val(param);
+    });
+});
+</script>
 
 {% endblock %}
