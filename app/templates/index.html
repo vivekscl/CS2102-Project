@@ -3,25 +3,10 @@
 
 {% block page_content %}
 
-<div class="page-header">
-    <h1>Add an item to share here!</h1>
-    {{ wtf.quick_form(form) }}
-</div>
-
-<div class="row">
-{% for item in items %}
-     <div class="col-sm-6 col-md-4 col-lg-4">
-        <div class="thumbnail">
-          <div class="caption">
-            <h3>{{ item['itemname'] }}</h3>
-            <h4>{{ item['price'] }}</h4>
-            <p>{{ item['description'] }}</p>
-            <a href="#" class="btn btn-primary" role="button" onclick="populateForm({{ item }}); return false;">Update</a>
-            <a href="#" class="btn btn-danger" role="button">Delete</a>
-          </div>
-        </div>
-      </div>
-{%- endfor %}
+<div class="jumbotron background-blue">
+    <h1>Here are your current listings!</h1>
+    <p>If there isn't any, click the button below to add one!</p>
+    <p><a class="btn btn-primary btn-lg" href="#" role="button">Add Listing</a></p>
 </div>
 
 <div>
@@ -29,60 +14,4 @@
     <p>This was updated {{ moment(current_time).fromNow(refresh=True) }}</p>
 </div>
 
-<script>
-    function populateForm(item) {
-        var form = document.forms[0];
-        var save_button = document.createElement("input");
-        save_button.type = "button";
-        save_button.setAttribute("id", "saveBtn");
-        save_button.value = "Save Changes";
-        save_button.className = "btn btn-default";
-
-        // Updates the chosen item to the form
-        $('#item_name').val(item[0]);
-        $('#description').val(item[1]);
-        $('#price').val(item[2]);
-
-        // Get old item
-        var oldItem = {
-            "item_name": item[0],
-            "description": item[1],
-            "price": item[2]
-        };
-
-        if ($("#saveBtn").length == 0){
-          form.appendChild(save_button);
-        }
-
-
-        save_button.onclick = function() {
-            // Get new item
-            var newItem = {
-                "item_name": $('#item_name').val(),
-                "description": $('#description').val(),
-                "price": parseFloat($('#price').val())
-            }
-
-            var data = {};
-            data["oldItem"] = oldItem;
-            data["newItem"] = newItem;
-            console.log(data);
-
-            $.ajax({
-                url: "{{ url_for('updateItem') }}",
-                data: JSON.stringify(data),
-                contentType: 'application/json',
-                type: 'POST',
-                success: function(response) {
-                    console.log(response);
-                    save_button.remove();
-                    location.reload();
-                },
-                error: function(error) {
-                    console.log(error);
-                }
-            });
-        }
-    }
-</script>
 {% endblock %}

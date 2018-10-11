@@ -26,7 +26,7 @@ def connect_db():
     return conn
 
 
-def init_db():
+def init_db(): 
     """
     Create database first if it doesn't exist
     postgres is the default db and can be used temporarily to interact with the db server and get useful info
