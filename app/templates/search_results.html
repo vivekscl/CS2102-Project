@@ -10,15 +10,17 @@
 <div>
     {% if listing is defined and listing|length > 0 %}
         {% for listing in listing %}
-            <div class="panel panel-default">
-                <h4 class="panel-heading">{{ listing.name }}</h4>
-                <div class="panel-body">
-                    <p>{{ listing.description }}</p>
-                    <p>Owned By:</p>
-                    <p>
-                        <span class="label label-primary">Primary Label</span>
-                        <span class="label label-primary">Primary Label</span>
-                    </p>
+            <div onclick="location.href='{{ url_for('listing_details', listing_id=listing.listing_id)}}'">
+                <div class="panel panel-default">
+                    <h4 class="panel-heading">{{ listing.name }}</h4>
+                    <div class="panel-body">
+                        <p>{{ listing.description }}</p>
+                        <p>Owned By:</p>
+                        <p>
+                            <span class="label label-primary">Primary Label</span>
+                            <span class="label label-primary">Primary Label</span>
+                        </p>
+                    </div>
                 </div>
             </div>
         {% endfor %}
