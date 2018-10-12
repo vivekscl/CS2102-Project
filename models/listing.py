@@ -1,6 +1,5 @@
 from db import listing_queries
-from db import tag_queries
-
+from db import tag_queries, DatabaseCursor
 
 class Listing:
 
@@ -44,6 +43,50 @@ def get_listings_under_owner(owner_id):
         return None
     return [Listing(**row) for row in rows]
 
+def get_all_listings():
+    with DatabaseCursor() as cursor:
+        cursor.execute('''select * 
+                          from listing''')
+        result = cursor.fetchall()
+    return result
+
+def get_listings_owner_id():
+    with DatabaseCursor() as cursor:
+        cursor.execute('''select * 
+                          from listing l 
+                          order by l.owner_id''')
+        result=cursor.fetchall()
+    return result
+
+number = 5
+
+# extract top 'number' listings if there exists
+def get_expensive_listings():
+    with DatabaseCursor() as cursor:
+        cursor.execute('''select l.listing_id, l.name, l.is_available , max(price)
+                          from listing l , bid b 
+                          where l.listing_id = b.listing_id
+                          group by l.listing_id, l.name, l.is_available
+                          order by max(price) desc''')
+        result = cursor.fetchall()
+        if len(result)<= number:
+            return result
+        else:
+            return result[0:number]
+
+# extract top 'number' listings if there exists
+def get_popular_listings():
+    with DatabaseCursor() as cursor:
+        cursor.execute('''select l.listing_id, l.name, l.is_available, count(*)
+                          from listing l, bid b
+                          where l.listing_id = b.listing_id
+                          group by l.listing_id, l.name, l.is_available
+                          order by count(*) desc''')
+        result = cursor.fetchall()
+        if len(result)<=number:
+            return result
+        else:
+            return result[0:number]
 
 def get_all_listing():
     rows = listing_queries.get_all_listing()

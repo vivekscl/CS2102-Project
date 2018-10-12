@@ -43,3 +43,6 @@ def get_user_by_username(username):
     if row is None:
         return None
     return User(**row)
+
+def get_users():
+    return user_queries.retrieve_user()

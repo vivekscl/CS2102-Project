@@ -29,3 +29,8 @@ def insert_user(username, name, password, phone_no=None):
         current_app.logger.info("INSERTION FAILED: [{}, {}, {}]".format(username, name, password, phone_no))
         return False
 
+def retrieve_user():
+    with DatabaseCursor() as cursor:
+        cursor.execute('select * from users')
+        result=cursor.fetchall()
+    return result

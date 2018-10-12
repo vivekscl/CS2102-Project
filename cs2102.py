@@ -5,6 +5,7 @@ from models import user as user_model, listing as listing_model, bid as bid_mode
 from werkzeug.security import generate_password_hash
 from flask import render_template, redirect, url_for, g, flash, request
 from datetime import datetime
+from db import DatabaseCursor
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 
@@ -93,13 +94,18 @@ def register():
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    all_listings = listing_model.get_all_listings()
+    expensive_listings = listing_model.get_expensive_listings()
+    popular_listings = listing_model.get_popular_listings()
+    
     form = SearchForm();
     form2 = SearchByOwnerForm();
     if form.validate_on_submit():
         return redirect(url_for('search_results', query=form.search.data))
     if form2.validate_on_submit():
         return redirect(url_for('search_results_owner', query=form2.search.data))
-    return render_template('index.html', form=form, form2=form2, current_time=datetime.utcnow())
+    return render_template('index.html', form=form, form2=form2, current_time=datetime.utcnow(), e_listings=expensive_listings, p_listings=popular_listings)
+
 
 
 @app.route('/user', methods=['GET'])
