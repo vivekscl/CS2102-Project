@@ -14,7 +14,7 @@ class ItemForm(FlaskForm):
     """
     item_name = StringField("Item Name: ", validators=[DataRequired()])
     description = StringField("Description: ", validators=[DataRequired()])
-    image = FileField("Item Image: ", validators=[DataRequired()])
+    image = FileField("Item Image: ", validators=[Optional()])
     submit = SubmitField("Submit")
 
 
