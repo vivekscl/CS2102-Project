@@ -50,10 +50,12 @@ class SignUpForm(FlaskForm):
 
 
 class SearchForm(FlaskForm):
-    search = StringField("", validators=[DataRequired()])
+    search = StringField("", validators=[Optional()])
+
 
 class SearchByOwnerForm(FlaskForm):
-    search = StringField("", validators=[DataRequired()])
+    search = StringField("", validators=[Optional()])
+
 
 class BidForm(FlaskForm):
     price = DecimalField('Price: ', validators=[DataRequired()])

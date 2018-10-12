@@ -98,14 +98,13 @@ def index():
     expensive_listings = listing_model.get_expensive_listings()
     popular_listings = listing_model.get_popular_listings()
     
-    form = SearchForm();
-    form2 = SearchByOwnerForm();
+    form = SearchForm()
+    form2 = SearchByOwnerForm()
     if form.validate_on_submit():
         return redirect(url_for('search_results', query=form.search.data))
     if form2.validate_on_submit():
         return redirect(url_for('search_results_owner', query=form2.search.data))
     return render_template('index.html', form=form, form2=form2, current_time=datetime.utcnow(), e_listings=expensive_listings, p_listings=popular_listings)
-
 
 
 @app.route('/user', methods=['GET'])
@@ -124,7 +123,9 @@ def user_page():
             not_available.append(listing)
     return render_template('user.html', available=available, not_available=not_available, loans=loans)
 
-@app.route('/search_results/<query>', methods=['GET'])
+
+@app.route('/search_results', defaults={'query': ''})
+@app.route('/search_results/<string:query>')
 def search_results(query):
     if not query:
         listing = listing_model.get_all_listing()
