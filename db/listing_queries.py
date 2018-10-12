@@ -35,7 +35,7 @@ def insert_listing(owner_id, name, description, is_available=True):
 def update_listing(listing_id, owner_id, name, description, is_available=True):
     try:
         with DatabaseCursor() as cursor:
-            cursor.execute('UPDATE listing SET owner_id = %s, name = %s, description = %s, is_available = %s'
+            cursor.execute('UPDATE listing SET owner_id = %s, name = %s, description = %s, is_available = %s '
                            'where listing_id = %s;',
                            (owner_id, name, description, is_available, listing_id))
             current_app.logger.info("Listing {} updated: [{}, {}, {}, {}]"

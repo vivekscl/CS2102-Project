@@ -28,18 +28,18 @@
             <ul class="nav navbar-nav navbar-right">
                 {% if current_user.is_authenticated %} {# This is a User object that has special functions given by
                 Flask-Login, such as checking if the user is logged in #}
-                <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">{{ current_user.name }}
-                <span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                      <li><a href="#">{{ current_user.phonenumber }}</a></li> {# dont need to list phone number here,
-                      just experimenting #}
-                      <li><a href="{{ url_for('user_page') }}">Profile page</a></li></li>
-                    </ul>
-                 </li>
-                <li><a href="{{ url_for('logout') }}">Log Out</a></li>
+                    <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">{{ current_user.name }}
+                    <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                          <li><a href="#">{{ current_user.phonenumber }}</a></li> {# dont need to list phone number here,
+                          just experimenting #}
+                          <li><a href="{{ url_for('user_page') }}">Profile page</a></li></li>
+                        </ul>
+                     </li>
+                    <li><a href="{{ url_for('logout') }}">Log Out</a></li>
                 {% else %}
-                <li><a href="{{ url_for('login') }}">Log In</a></li>
-                <li><a href="{{ url_for('register') }}">Sign Up</a></li>
+                    <li><a href="{{ url_for('login') }}">Log In</a></li>
+                    <li><a href="{{ url_for('register') }}">Sign Up</a></li>
                 {% endif %}
             </ul>
         </div>

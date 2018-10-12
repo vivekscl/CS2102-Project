@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block page_content %}
+
+<div class="page-header">
+    <h1>Add an item to share here!</h1>
+    {{ wtf.quick_form(form) }}
+</div>
+
+<div>
+    <p>Local Date and Time: {{ moment(current_time).format('LLL') }}</p>
+    <p>This was updated {{ moment(current_time).fromNow(refresh=True) }}</p>
+</div>
+
+{% endblock %}

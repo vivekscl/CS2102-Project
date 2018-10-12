@@ -14,7 +14,7 @@
       <div class="media-body">
         <h3 class="media-heading">{{ listing.name }}</h3>
         <h4>Owned By: {{ owner.name }}</h4>
-        <p>{{ listing.description }}</p>
+        <p>Description: {{ listing.description }}</p>
       </div>
     </div>
 
@@ -25,15 +25,50 @@
     <div>
         {% if bids_under_this_listing is defined and bids_under_this_listing|length > 0 %}
             {% for bid in bids_under_this_listing %}
-                <div>
-                    <p>Price: {{ bid.price }}</p>
-                    <p>Bidder: {{ bid.bidder_id }}</p>
-                    <p>Date & Time: {{ bid.bid_date }}</p>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">{{ bid.bidder_id | convert_bidder_id_to_name }} bid on {{ moment(bid.bid_date).format('LLL') }}</div>
+                    <div class="panel-body">
+                        <h1> <span class="label label-default">${{ bid.price }}</span> </h1>
+                        <div class="btn-group pull-right" role="group" aria-label="...">
+                            {% if current_user.is_authenticated and current_user.id == bid.bidder_id %}
+                                <button type="button" class="btn btn-primary" data-toggle="modal"
+                                        data-target="#updateBidModal" data-id="{{ bid.bidder_id }}"
+                                        data-price="{{ bid.price }}">Update</button>
+{#                                <form action="/delete/{{item['itemname']}}" method="post">#}
+{#                                <button type="button" class="btn btn-danger">Remove</button>#}
+{#                                </form>#}
+                            {% endif %}
+                            {% if current_user.is_authenticated and current_user.id == owner.id %}
+                                <a href="{{ url_for('generate_loan', bidder_id=bid.bidder_id,
+                                listing_id=listing.listing_id, listing_name=listing.name) }}"
+                                   class="btn btn-success">Choose this bid</a>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
+
             {% endfor %}
         {% else %}
             <h2>There are no bids for this listing at the moment.</h2>
         {% endif %}
     </div>
-
+    {% if current_user.is_authenticated and listing.owner_id == current_user.id %}
+        <div><button type="button" class="btn btn-primary btn-lg btn-block" disabled data-toggle="tooltip"
+                     data-placement="bottom" title="You cannot bid for your own listing">Bid for this item!</button>
+    {# You should remove this check and let the db run the check and then you catch it and show an error #}
+        </div>
+    {% elif current_user.is_authenticated %}
+        <div><button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal"
+                                        data-target="#bidModal">Bid for this item!</button>
+        </div>
+    {% else %}
+        <div><button type="button" class="btn btn-primary btn-lg btn-block" disabled data-toggle="tooltip"
+                     data-placement="bottom" title="You must be logged in to bid">Bid for this item!</button>
+        </div>
+    {% endif %}
+    {% include 'bid_modal.html' %}
+    {% include 'update_bid_modal.html' %}
 {% endblock %}
+
+
