@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, DecimalField, BooleanField, PasswordField
+from wtforms import StringField, SubmitField, DecimalField, BooleanField, PasswordField, FileField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, Length, Regexp, EqualTo, ValidationError, Optional, InputRequired
 from models import user
@@ -14,7 +14,7 @@ class ItemForm(FlaskForm):
     """
     item_name = StringField("Item Name: ", validators=[DataRequired()])
     description = StringField("Description: ", validators=[DataRequired()])
-    price = DecimalField('Price: ', validators=[DataRequired()])
+    image = FileField("Item Image: ", validators=[DataRequired()])
     submit = SubmitField("Submit")
 
 
