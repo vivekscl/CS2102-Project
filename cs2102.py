@@ -1,8 +1,7 @@
 import os
-from app import create_app, ItemForm, LoginForm, SignUpForm, login_manager
-from app import create_app, ItemForm, LoginForm, SignUpForm, BidForm, GenerateLoanForm, login_manager
+from app import create_app, ItemForm, LoginForm, SignUpForm, BidForm, GenerateLoanForm, login_manager, SearchForm, SearchByOwnerForm
 from flask_login import login_required, logout_user, login_user, current_user
-from models import user as user_model, listing as listing_model, bid as bid_model, loan as loan_model
+from models import user as user_model, listing as listing_model, bid as bid_model, loan as loan_model, tag as tag_model, listing_tag as listing_tag_model
 from werkzeug.security import generate_password_hash
 from flask import render_template, redirect, url_for, g, flash, request
 from datetime import datetime
@@ -92,9 +91,15 @@ def register():
     return render_template('register.html', form=form)
 
 
-@app.route('/', methods=['GET'])
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template('index.html', current_time=datetime.utcnow())
+    form = SearchForm();
+    form2 = SearchByOwnerForm();
+    if form.validate_on_submit():
+        return redirect(url_for('search_results', query=form.search.data))
+    if form2.validate_on_submit():
+        return redirect(url_for('search_results_owner', query=form2.search.data))
+    return render_template('index.html', form=form, form2=form2, current_time=datetime.utcnow())
 
 
 @app.route('/user', methods=['GET'])
@@ -111,8 +116,25 @@ def user_page():
             available.append(listing)
         else:
             not_available.append(listing)
-
     return render_template('user.html', available=available, not_available=not_available, loans=loans)
+
+@app.route('/search_results/<query>', methods=['GET'])
+def search_results(query):
+    if not query:
+        listing = listing_model.get_all_listing()
+    else:
+        listing = listing_model.get_listings_by_tag_name(query)
+    return render_template('search_results.html', listing=listing)
+
+
+@app.route('/search_results_owner/<query>', methods=['GET'])
+def search_results_owner(query):
+    if not query:
+        listing = listing_model.get_all_listing()
+    else:
+        listing = listing_model.get_listings_by_owner_name(query)
+    return render_template('search_results_owner.html', listing=listing)
+    
 
 @app.route('/listing/create', methods=['GET', 'POST'])
 @login_required

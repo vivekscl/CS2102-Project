@@ -1,4 +1,5 @@
 from db import listing_queries
+from db import tag_queries
 
 
 class Listing:
@@ -39,6 +40,27 @@ def get_listing_by_id(listing_id):
 
 def get_listings_under_owner(owner_id):
     rows = listing_queries.get_listings_under_owner(owner_id)
+    if rows is None:
+        return None
+    return [Listing(**row) for row in rows]
+
+
+def get_all_listing():
+    rows = listing_queries.get_all_listing()
+    if rows is None:
+        return None
+    return [Listing(**row) for row in rows]
+
+
+def get_listings_by_owner_name(owner_name):
+    rows = listing_queries.get_listings_by_owner_name(owner_name)
+    if rows is None:
+        return None
+    return [Listing(**row) for row in rows]
+
+
+def get_listings_by_tag_name(tag_name):
+    rows = tag_queries.get_listings_by_tag_name(tag_name)
     if rows is None:
         return None
     return [Listing(**row) for row in rows]

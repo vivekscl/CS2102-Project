@@ -12,6 +12,13 @@ def get_listing_by_id(listing_id):
         return cursor.fetchone()
 
 
+def get_all_listing():
+    with DatabaseCursor() as cursor:
+        current_app.logger.info("Getting all listing from database".format())
+        cursor.execute('SELECT * FROM LISTING;')
+        return cursor.fetchall()
+
+
 def insert_listing(owner_id, name, description, is_available=True):
     try:
         with DatabaseCursor() as cursor:
@@ -49,4 +56,10 @@ def get_listings_under_owner(owner_id):
     with DatabaseCursor() as cursor:
         current_app.logger.info("Getting listings under user with ID {}".format(owner_id))
         cursor.execute('select * from listing where owner_id = %s', (owner_id,))
+        return cursor.fetchall()
+
+def get_listings_by_owner_name(owner_name):
+    with DatabaseCursor() as cursor:
+        current_app.logger.info("Getting listings under user with name {}".format(owner_name))
+        cursor.execute('SELECT * FROM listing WHERE owner_id IN (SELECT id FROM users WHERE name = %s)', (owner_name,))
         return cursor.fetchall()

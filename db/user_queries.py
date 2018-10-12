@@ -23,9 +23,9 @@ def insert_user(username, name, password, phone_no=None):
     try:
         with DatabaseCursor() as cursor:
             cursor.execute('INSERT INTO users VALUES(DEFAULT, %s, %s, %s, %s);', (username, name, password, phone_no))
-            current_app.logger.info("User added to database: [{}, {}, {}, {}]"
-                                    .format(username, name, password, phone_no))
+            current_app.logger.info("User added to database: [{}, {}, {}, {}]".format(username, name, password, phone_no))
             return True
     except psycopg2.IntegrityError:
         current_app.logger.info("INSERTION FAILED: [{}, {}, {}]".format(username, name, password, phone_no))
         return False
+
