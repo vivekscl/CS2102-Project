@@ -29,16 +29,14 @@ tr:nth-child(even) {
   <table>
   <tr>
     <th>Item Name</th>
-    <th>Is Available</th>
     <th>Highest Bid</th>
   </tr>
 
   {% for listing in e_listings %}
   
   <tr>
-    <td>{{listing[0]}}</td>
-    <td>{{listing[1]}}</td>
-    <td>{{listing[2]}}</td>
+    <td><a href="/listing/{{listing[0]}}">{{listing[1]}}</a></td>
+    <td>{{listing[3]}}</td>
   </tr>
   {%- endfor %}
 </table>
@@ -47,16 +45,14 @@ tr:nth-child(even) {
 <table>
   <tr>
     <th>Item Name</th>
-    <th>Is Available</th>
     <th>Number of Bidders</th>
   </tr>
 
   {% for listing in p_listings %}
   
   <tr>
-    <td>{{listing[0]}}</td>
-    <td>{{listing[1]}}</td>
-    <td>{{listing[2]}}</td>
+    <td><a href="/listing/{{listing[0]}}">{{listing[1]}}</a></td>
+    <td>{{listing[3]}}</td>
   </tr>
   {%- endfor %}
 </table>
