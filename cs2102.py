@@ -1,14 +1,13 @@
 import os
-from app import create_app, LoginForm, SignUpForm, login_manager
-from flask_login import login_required, logout_user, login_user
-from models import user as user_model, listing as listing_model, bid as bid_model
+from app import create_app, ItemForm, LoginForm, SignUpForm, BidForm, GenerateLoanForm, login_manager, SearchForm, SearchByOwnerForm
+from flask_login import login_required, logout_user, login_user, current_user
+from models import user as user_model, listing as listing_model, bid as bid_model, loan as loan_model, tag as tag_model, listing_tag as listing_tag_model
 from werkzeug.security import generate_password_hash
 from flask import render_template, redirect, url_for, g, flash, request
 from datetime import datetime
 from db import DatabaseCursor
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
-
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -19,6 +18,26 @@ def load_user(user_id):
     :return: User who's id his the given id
     """
     return user_model.get_user_by_id(user_id)
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+
+@app.template_filter('convert_bidder_id_to_name')
+def convert_bidder_id_to_name(bidder_id):
+    return user_model.get_user_by_id(bidder_id).name
+
+
+@app.template_filter('convert_listing_id_to_name')
+def convert_listing_id_to_name(listing_id):
+    return listing_model.get_listing_by_id(listing_id).name
+
+
+@app.template_filter('convert_listing_id_to_description')
+def convert_listing_id_to_description(listing_id):
+    return listing_model.get_listing_by_id(listing_id).description
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -73,27 +92,137 @@ def register():
     return render_template('register.html', form=form)
 
 
-@app.route('/', methods=['GET'])
+@app.route('/', methods=['GET', 'POST'])
 def index():
     all_listings = listing_model.get_all_listings()
     expensive_listings = listing_model.get_expensive_listings()
     popular_listings = listing_model.get_popular_listings()
-    return render_template('index.html', current_time=datetime.utcnow(), e_listings=expensive_listings, p_listings=popular_listings)
+    
+    form = SearchForm();
+    form2 = SearchByOwnerForm();
+    if form.validate_on_submit():
+        return redirect(url_for('search_results', query=form.search.data))
+    if form2.validate_on_submit():
+        return redirect(url_for('search_results_owner', query=form2.search.data))
+    return render_template('index.html', form=form, form2=form2, current_time=datetime.utcnow(), e_listings=expensive_listings, p_listings=popular_listings)
+
 
 
 @app.route('/user', methods=['GET'])
 @login_required
 def user_page():
-    return render_template('user.html', current_time=datetime.utcnow())
+    listings = listing_model.get_listings_under_owner(current_user.id)
+    loans = loan_model.get_loans_under_bidder(current_user.id)
+    available = []
+    not_available = []
+
+    print(loans)
+    for listing in listings:
+        if listing.is_available == 'true':
+            available.append(listing)
+        else:
+            not_available.append(listing)
+    return render_template('user.html', available=available, not_available=not_available, loans=loans)
+
+@app.route('/search_results/<query>', methods=['GET'])
+def search_results(query):
+    if not query:
+        listing = listing_model.get_all_listing()
+    else:
+        listing = listing_model.get_listings_by_tag_name(query)
+    return render_template('search_results.html', listing=listing)
 
 
-@app.route('/listing/<int:listing_id>', methods=['GET'])
+@app.route('/search_results_owner/<query>', methods=['GET'])
+def search_results_owner(query):
+    if not query:
+        listing = listing_model.get_all_listing()
+    else:
+        listing = listing_model.get_listings_by_owner_name(query)
+    return render_template('search_results_owner.html', listing=listing)
+    
+
+@app.route('/listing/create', methods=['GET', 'POST'])
+@login_required
+def create_listing():
+
+    form = ItemForm()
+
+    # If a post request is sent, validate the form and insert the listing into the db using listing_model
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            listing = listing_model.Listing(None, current_user.id, form.item_name.data, form.description.data)
+            if listing.create_listing():
+                flash("New listing added!", "success")
+                return redirect(url_for('index'))
+            else:
+                flash('Unable to add the listing!', "error")
+                app.logger.warning("Insert failed") # to-do provide error msg for diff insertion error
+
+
+    return render_template('create_listing.html', form=form, current_time=datetime.utcnow())
+
+@app.route('/listing/<int:listing_id>', methods=['GET', 'POST'])
 def listing_details(listing_id):
     """
     The route shows the listing details of the given listing ID
     :param listing_id:
     """
-    listing = listing_model.get_listing_by_id(listing_id)
+    if listing_model.get_listing_by_id(listing_id).is_available == 'false':
+        flash("That listing is out for loan and not available for bidding", "error")
+        return redirect(url_for('index'))
+    form = BidForm()
     bids = bid_model.get_bids_under_listing(listing_id)
+    # check if avail is false then redirect depending on whether the user is the owner or not
+    listing = listing_model.get_listing_by_id(listing_id)
     owner = user_model.get_user_by_id(listing.owner_id)
-    return render_template('listing.html', listing=listing, bids_under_this_listing=bids, owner=owner)
+    if request.method == 'POST':
+        if not current_user.is_authenticated:  # check if user is logged in to send a post request
+            return login_manager.unauthorized()
+        if 'bidder_id' in request.form:  # update bid
+            bidder_id = int(request.form.get('bidder_id'))
+            new_price = float(request.form.get('bid_price'))
+            bid_to_update = [bid for bid in bids if bid.bidder_id == bidder_id][0]
+            if bid_to_update.update_bid(price=new_price):
+                flash("Updated your bid successfully", "success")
+            else:
+                flash("Updated failed", "error")
+
+        elif form.validate_on_submit():  # create new bid
+            new_bid = bid_model.Bid(current_user.id, listing_id, datetime.now(), form.price.data)
+            if new_bid.create_bid():
+                flash("Your bid has been placed", "success")
+            else:
+                flash("Placing of bid has failed", "error")
+
+        return redirect(url_for('listing_details', listing_id=listing_id))
+    return render_template('listing.html', listing=listing, bids_under_this_listing=bids, owner=owner, form=form)
+
+
+@app.route('/generate_loan/<int:bidder_id>/<int:listing_id>/<string:listing_name>', methods=['GET', 'POST'])
+@login_required
+def generate_loan(bidder_id, listing_id, listing_name):
+    form = GenerateLoanForm()
+    if request.method == 'POST' and form.validate_on_submit():
+        bid_date = bid_model.get_bid_under_listing_and_bidder(bidder_id, listing_id).bid_date
+        borrow_date = datetime.now()
+        return_date = datetime.combine(form.return_date.data, datetime.now().time())
+        loan_model.Loan(bidder_id, listing_id, bid_date, borrow_date, return_date, form.return_loc.data,
+                        form.pickup_loc.data).create_loan()  # check if loan was created and flash success
+        bid_model.delete_all_bids_of_listing_not_under_bidder(listing_id, bidder_id)
+        listing_model.get_listing_by_id(listing_id).update_listing(is_available=False)
+        return redirect(url_for('loan_details', listing_id=listing_id))
+    return render_template('loan_generation.html', form=form, bidder_id=bidder_id, listing_name=listing_name)
+
+
+@app.route('/loan/<int:listing_id>', methods=['GET', 'POST'])
+@login_required
+def loan_details(listing_id):
+    if request.method == 'POST':
+        loan_model.delete_loan_of_listing(listing_id)
+        bid_model.delete_bids_of_listing(listing_id)
+        listing_model.get_listing_by_id(listing_id).update_listing(is_available=True)
+        flash("Loan returned", "success")
+        return redirect(url_for('index'))
+    current_loan = loan_model.get_loan_of_listing(listing_id)  # Need to check if None Type
+    return render_template('loan.html', loan=current_loan)

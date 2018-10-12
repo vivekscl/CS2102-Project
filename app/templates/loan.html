@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block page_content %}
+
+    <div class="page-header">
+        <h1>Loan Details</h1>
+    </div>
+
+    <div class="media">
+      <div class="media-left">
+          <img class="media-object" src="https://via.placeholder.com/350x150" alt="placeholder">
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading">{{ loan.listing_id | convert_listing_id_to_name }}</h3>
+        <h4>Loaned To: {{ loan.bidder_id | convert_bidder_id_to_name }}</h4>
+        <p>Description: {{ loan.listing_id | convert_listing_id_to_description }}</p>
+        <p>Borrowed On: {{ loan.borrow_date }}</p>
+        <p>Borrowed From: {{ loan.pickup_loc }}</p>
+        <p>Will be return at: {{ loan.return_loc }} on {{ moment(loan.return_date).format('LLL') }}</p>
+{#          <button class="media-bottom btn btn-danger">Return</button>#}
+      </div>
+    </div>
+    <div>
+        <form action="{{ url_for('loan_details', listing_id=loan.listing_id) }}" method="post">
+            <button type="submit" class="btn btn-danger btn-lg btn-block" data-toggle="modal" data-target="#bidModal">
+                Return</button>
+        </form>
+    </div>
+
+{% endblock %}

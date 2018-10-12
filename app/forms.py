@@ -1,7 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, DecimalField, BooleanField, PasswordField
-from wtforms.validators import DataRequired, Length, Regexp, EqualTo, ValidationError, Optional
+from wtforms import StringField, SubmitField, DecimalField, BooleanField, PasswordField, FileField, SelectField
+from wtforms.fields.html5 import DateField
+from wtforms.validators import DataRequired, Length, Regexp, EqualTo, ValidationError, Optional, InputRequired
 from models import user
+from datetime import datetime
 
 
 class ItemForm(FlaskForm):
@@ -12,7 +14,7 @@ class ItemForm(FlaskForm):
     """
     item_name = StringField("Item Name: ", validators=[DataRequired()])
     description = StringField("Description: ", validators=[DataRequired()])
-    price = DecimalField('Price: ', validators=[DataRequired()])
+    image = FileField("Item Image: ", validators=[Optional()])
     submit = SubmitField("Submit")
 
 
@@ -44,3 +46,29 @@ class SignUpForm(FlaskForm):
         """
         if user.get_user_by_username(field.data):
             raise ValidationError("Username already in use")
+
+
+
+class SearchForm(FlaskForm):
+    search = StringField("", validators=[DataRequired()])
+
+class SearchByOwnerForm(FlaskForm):
+    search = StringField("", validators=[DataRequired()])
+
+class BidForm(FlaskForm):
+    price = DecimalField('Price: ', validators=[DataRequired()])
+    submit = SubmitField("Add your bid")
+
+
+class GenerateLoanForm(FlaskForm):
+    return_date = DateField('Expected date of return: ', format='%Y-%m-%d',
+                                     validators=[InputRequired()], default='')
+    return_loc = StringField("Return location: ", validators=[DataRequired(), Length(1, 512)])
+    pickup_loc = StringField("Pickup location: ", validators=[DataRequired(), Length(1, 512)])
+    submit = SubmitField("Generate Loan!")
+
+    def validate_return_date(self, field):
+        print(field.data)
+        dt = datetime.strptime(str(field.data), '%Y-%m-%d')
+        if dt < datetime.now():
+            raise ValidationError("That date has passed")

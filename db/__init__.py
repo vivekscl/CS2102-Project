@@ -49,3 +49,4 @@ def init_db():
     # Create tables from schema.sql
     with DatabaseCursor() as cursor:
         cursor.execute(open(Config.SCHEMA_LOCATION, "r").read())
+

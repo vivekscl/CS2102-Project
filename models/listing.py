@@ -1,5 +1,5 @@
 from db import listing_queries
-from db import DatabaseCursor
+from db import tag_queries, DatabaseCursor
 
 class Listing:
 
@@ -87,3 +87,23 @@ def get_popular_listings():
             return result
         else:
             return result[0:number]
+
+def get_all_listing():
+    rows = listing_queries.get_all_listing()
+    if rows is None:
+        return None
+    return [Listing(**row) for row in rows]
+
+
+def get_listings_by_owner_name(owner_name):
+    rows = listing_queries.get_listings_by_owner_name(owner_name)
+    if rows is None:
+        return None
+    return [Listing(**row) for row in rows]
+
+
+def get_listings_by_tag_name(tag_name):
+    rows = tag_queries.get_listings_by_tag_name(tag_name)
+    if rows is None:
+        return None
+    return [Listing(**row) for row in rows]
