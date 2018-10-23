@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, DecimalField, BooleanField, PasswordField, FileField, SelectField
-from wtforms.fields.html5 import DateField
-from wtforms.validators import DataRequired, Length, Regexp, EqualTo, ValidationError, Optional, InputRequired
+from wtforms import StringField, SubmitField, DecimalField, BooleanField, PasswordField, FileField
+from wtforms.fields.html5 import DateField, EmailField
+from wtforms.validators import DataRequired, Length, Regexp, EqualTo, ValidationError, Optional, InputRequired, Email
 from models import user
 from datetime import datetime
 
@@ -31,6 +31,7 @@ class SignUpForm(FlaskForm):
                                                      Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,
                                                             'Usernames must only have letters numbers, dots or '
                                                             'underscores')])
+    email = EmailField("Email Address: ", validators=[DataRequired(), Email()])
     password = PasswordField("Password:", validators=[DataRequired(), EqualTo('confirm_password',
                                                                               message='Passwords must match')])
     confirm_password = PasswordField("Confirm Password:", validators=[DataRequired()])

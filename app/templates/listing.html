@@ -41,7 +41,7 @@
                             {% endif %}
                             {% if current_user.is_authenticated and current_user.id == owner.id %}
                                 <a href="{{ url_for('generate_loan', bidder_id=bid.bidder_id,
-                                listing_id=listing.listing_id, listing_name=listing.name) }}"
+                                owner_id=listing.owner_id, listing_name=listing.listing_name) }}"
                                    class="btn btn-success">Choose this bid</a>
                             {% endif %}
                         </div>

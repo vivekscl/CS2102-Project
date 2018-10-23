@@ -55,8 +55,8 @@ tr:nth-child(even) {
   {% for listing in e_listings %}
   
   <tr>
-    <td><a href="/listing/{{listing[0]}}">{{listing[1]}}</a></td>
-    <td>{{listing[3]}}</td>
+    <td><a href="/listing/{{listing[0]}}/{{listing[1]}}">{{listing[0]}}</a></td>
+    <td>{{listing[2]}}</td>
   </tr>
   {%- endfor %}
 </table>
@@ -71,8 +71,8 @@ tr:nth-child(even) {
   {% for listing in p_listings %}
   
   <tr>
-    <td><a href="/listing/{{listing[0]}}">{{listing[1]}}</a></td>
-    <td>{{listing[3]}}</td>
+    <td><a href="/listing/{{listing[0]}}/{{listing[1]}}">{{listing[0]}}</a></td>
+    <td>{{listing[2]}}</td>
   </tr>
   {%- endfor %}
 </table>

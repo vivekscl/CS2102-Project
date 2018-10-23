@@ -39,14 +39,20 @@ def init_db():
     target_db = config[os.getenv("FLASK_CONFIG")].DATABASE_NAME
 
     # This command finds the database that we are creating, if it doesn't exist, the not_exist = None
-    cur.execute("SELECT COUNT(*) = 0 FROM pg_catalog.pg_database WHERE datname = '{}'".format(target_db))
-    not_exists_row = cur.fetchone()
-    not_exists = not_exists_row[0]
+    cur.execute("SELECT COUNT(*) = 0 FROM pg_catalog.pg_database WHERE datname = %s", (target_db,))
+    not_exists = cur.fetchone()[0]
+
+    cur.execute("select exists(select * from information_schema.tables where table_name IN (%s, %s, %s, %s, %s, %s))",
+                ('users', 'listing', 'bid', 'loan', 'tag', 'listing_tag'))
+    schema_exists = cur.fetchone()[0]
 
     if not_exists:
+        print("Initialising DB...")
         cur.execute("CREATE DATABASE {};".format(target_db))
 
     # Create tables from schema.sql
-    with DatabaseCursor() as cursor:
-        cursor.execute(open(Config.SCHEMA_LOCATION, "r").read())
+    if not schema_exists:
+        print("Initialising schema...")
+        with DatabaseCursor() as cursor:
+            cursor.execute(open(Config.SCHEMA_LOCATION, "r").read())
 
