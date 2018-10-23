@@ -1,55 +1,62 @@
 SET timezone = 'Asia/Singapore';
 
-CREATE TABLE IF NOT EXISTS users (
-  id SERIAL PRIMARY KEY,
-	username VARCHAR(128) UNIQUE NOT NULL,
+
+CREATE TABLE users (
+  user_id SERIAL PRIMARY KEY,
+  username VARCHAR(128) UNIQUE NOT NULL,
+  email VARCHAR(128) UNIQUE NOT NULL,
 	name VARCHAR(128) NOT NULL,
   password_hash VARCHAR(128) NOT NULL,
 	phone_no CHAR(8)
 );
 
-CREATE TABLE IF NOT EXISTS listing (
-	listing_id SERIAL PRIMARY KEY,
+CREATE TABLE listing (
+  listing_name VARCHAR(128) NOT NULL,
 	owner_id INTEGER,
-	name VARCHAR(128) NOT NULL,
 	description VARCHAR(512),
+	listed_date TIMESTAMP NOT NULL,
 	is_available VARCHAR(5) NOT NULL,
-    	FOREIGN KEY (owner_id) REFERENCES users(id),
-	CHECK (is_available='true' OR is_available='false')
+  FOREIGN KEY (owner_id) REFERENCES users(user_id),
+	PRIMARY KEY (listing_name, owner_id),
+	CHECK (is_available='TRUE' OR is_available='FALSE')
 );
 
-CREATE TABLE IF NOT EXISTS bid (
+CREATE TABLE bid (
 	bidder_id INTEGER,
-	listing_id INTEGER,
+	listing_name VARCHAR(128),
+	owner_id INTEGER,
 	bid_date TIMESTAMP,
 	price NUMERIC NOT NULL,
-	FOREIGN KEY (bidder_id) REFERENCES users(id) ON DELETE CASCADE,
-  FOREIGN KEY (listing_id) REFERENCES listing(listing_id) ON DELETE CASCADE,
-	PRIMARY KEY (bidder_id, listing_id, bid_date),
+	FOREIGN KEY (bidder_id) REFERENCES users(user_id) ON DELETE CASCADE,
+  FOREIGN KEY (listing_name, owner_id) REFERENCES listing(listing_name, owner_id) ON DELETE CASCADE,
+	PRIMARY KEY (bidder_id, listing_name, owner_id, bid_date),
 	CHECK (price >= 0)
 );
 
-CREATE TABLE IF NOT EXISTS loan (
+CREATE TABLE loan (
 	bidder_id INTEGER,
-	listing_id INTEGER,
+	listing_name VARCHAR(128),
+	owner_id INTEGER,
 	bid_date TIMESTAMP,
 	borrow_date TIMESTAMP,
 	return_date TIMESTAMP NOT NULL,
 	return_loc VARCHAR(512) NOT NULL,
 	pickup_loc VARCHAR(512) NOT NULL,
-  FOREIGN KEY (bidder_id, listing_id, bid_date) REFERENCES bid(bidder_id, listing_id, bid_date),
-  PRIMARY KEY (bidder_id, listing_id, bid_date, borrow_date),
+  FOREIGN KEY (bidder_id, listing_name, owner_id, bid_date) REFERENCES bid(bidder_id, listing_name, owner_id, bid_date),
+  PRIMARY KEY (bidder_id, listing_name, owner_id, bid_date, borrow_date),
 	CHECK (return_date >= borrow_date)
 );
-CREATE TABLE IF NOT EXISTS tag (
+
+CREATE TABLE tag (
 	tag_id SERIAL PRIMARY KEY,
 	name VARCHAR(16) UNIQUE NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS listing_tag (
+CREATE TABLE listing_tag (
 	tag_id INTEGER,
-	listing_id INTEGER,
+	listing_name VARCHAR(128),
+	owner_id INTEGER,
 	FOREIGN KEY (tag_id) REFERENCES tag(tag_id) ON DELETE CASCADE,
-  FOREIGN KEY (listing_id) REFERENCES listing(listing_id) ON DELETE CASCADE,
-	PRIMARY KEY(tag_id, listing_id)
+  FOREIGN KEY (listing_name, owner_id) REFERENCES listing(listing_name, owner_id) ON DELETE CASCADE,
+	PRIMARY KEY(tag_id, listing_name, owner_id)
 );
