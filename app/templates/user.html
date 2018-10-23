@@ -10,8 +10,8 @@
         <div class="row">
             <div id="listings" class="col-md-8 list-group">
                 {% for listing in available %}
-                    <a href="{{ url_for('listing_details', listing_id=listing.listing_id) }}" class="list-group-item">
-                        Name:{{ listing.name }}, Tag:Book</a>
+                    <a href="{{ url_for('listing_details', listing_name=listing.listing_name, owner_id=listing.owner_id) }}" class="list-group-item">
+                        Name: {{ listing.listing_name }}, Tag: Book</a>
                 {% endfor %}
             </div>
 
@@ -37,9 +37,9 @@
             <div class="row">
                 <div class="col-md-8 list-group">
                     {% for listing in not_available %}
-                        <a href="{{ url_for('loan_details', listing_id=listing.listing_id) }}"
+                        <a href="{{ url_for('loan_details', listing_name=listing.listing_name, owner_id=listing.owner_id) }}"
                            class="list-group-item">
-                            Name:{{ listing.name }}, Tag:Book</a>
+                            Name: {{ listing.listing_name }}, Tag: Book</a>
                     {% endfor %}
                 </div>
             </div>

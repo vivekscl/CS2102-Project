@@ -8,7 +8,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <form action="{{ url_for('listing_details', listing_id=listing.listing_id) }}" method="post">
+        <form action="{{ url_for('listing_details', listing_name=listing.listing_name, owner_id=listing.owner_id) }}" method="post">
           <div class="form-group">
             <label for="recipient-name" class="col-form-label">Price:</label>
             <input name="bid_price" type="number" step="any" min="0" class="form-control" id="bid_price" required>
