@@ -81,9 +81,10 @@ def get_popular_listings():
 
 def get_expensive_listings():
     with DatabaseCursor() as cursor:
-        cursor.execute('''select l.listing_name, l.owner_id , price
+        cursor.execute('''select l.listing_name, l.owner_id , max(price)
                           from listing l , bid b 
                           where l.listing_name = b.listing_name and l.owner_id = b.owner_id and l.is_available = 'true'
-                          order by price desc
+                          group by l.listing_name, l.owner_id
+                          order by max(price) desc
                           limit 5''')
         return cursor.fetchall()
