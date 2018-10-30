@@ -94,11 +94,11 @@ CREATE OR REPLACE FUNCTION stop_insertion() RETURNS TRIGGER AS $$
         RAISE NOTICE 'You cannot bid for your own item!';
         RETURN NULL;
     END; $$
-LANGUAGE plpgsql
+LANGUAGE plpgsql;
 
 CREATE TRIGGER on_bid_insert
     BEFORE INSERT
     ON bid 
     FOR EACH ROW
     WHEN (NEW.bidder_id = NEW.owner_id)
-    EXECUTE PRODEDURE stop_insertion()
+    EXECUTE PRODEDURE stop_insertion();
