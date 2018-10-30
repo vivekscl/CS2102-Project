@@ -10,32 +10,34 @@ def get_loans_under_bidder(bidder_id):
         return cursor.fetchall()
 
 
-def insert_loan(bidder_id, listing_id, bid_date, borrow_date, return_date, return_loc, pickup_loc):
+def insert_loan(bidder_id, listing_name, owner_id, bid_date, borrow_date, return_date, return_loc, pickup_loc):
     try:
         with DatabaseCursor() as cursor:
-            cursor.execute('INSERT INTO loan VALUES(%s, %s, %s, %s, %s, %s, %s);', (bidder_id, listing_id, bid_date,
-                                                                                    borrow_date, return_date,
-                                                                                    return_loc, pickup_loc))
-            current_app.logger.info("Loan added to database: [{}, {}, {}, {}, {}, {}, {}]"
-                                    .format(bidder_id, listing_id, bid_date, borrow_date, return_date, return_loc,
-                                            pickup_loc))
+            cursor.execute('INSERT INTO loan VALUES(%s, %s, %s, %s, %s, %s, %s, %s);', (bidder_id, listing_name,
+                                                                                        owner_id, bid_date, borrow_date,
+                                                                                        return_date, return_loc,
+                                                                                        pickup_loc))
+            current_app.logger.info("Loan added to database: [{}, {}, {}, {}, {}, {}, {}, {}]"
+                                    .format(bidder_id, listing_name, owner_id, bid_date, borrow_date, return_date,
+                                            return_loc, pickup_loc))
             return True
     except psycopg2.IntegrityError:
-        current_app.logger.error("INSERTION FAILED: [{}, {}, {}, {}, {}, {}, {}]"
-                                 .format(bidder_id, listing_id, bid_date, borrow_date, return_date, return_loc,
-                                         pickup_loc))
+        current_app.logger.error("INSERTION FAILED: [{}, {}, {}, {}, {}, {}, {}, {}]"
+                                 .format(bidder_id, listing_name, owner_id, bid_date, borrow_date, return_date,
+                                         return_loc, pickup_loc))
         return False
 
 
-def get_loan_of_listing(listing_id):
+def get_loan_of_listing(listing_name, owner_id):
     with DatabaseCursor() as cursor:
-        current_app.logger.info("Getting loan with listing ID {} from database".format(listing_id))
-        cursor.execute('select * from loan where listing_id = %s;', (listing_id,))
+        current_app.logger.info("Getting loan with listing {} from owner {} from database".format(listing_name,
+                                                                                                  owner_id))
+        cursor.execute('select * from loan where listing_name = %s and owner_id = %s;', (listing_name, owner_id))
         return cursor.fetchone()
 
 
-def delete_loan_of_listing(listing_id):
+def delete_loan_of_listing(listing_name, owner_id):
     with DatabaseCursor() as cursor:
-        current_app.logger.info("Deleting loan with listing ID {} from database"
-                                .format(listing_id))
-        cursor.execute("delete from loan where listing_id = %s", (listing_id,))
+        current_app.logger.info("Deleting loan with listing {} of owner {} from database"
+                                .format(listing_name, owner_id))
+        cursor.execute("delete from loan where listing_name = %s and owner_id = %s", (listing_name, owner_id))

@@ -2,6 +2,23 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 {% block page_content %}
+<style>
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+</style>
 
 <div class="jumbotron background-blue">
     <h1>Welcome to Stuff Sharing Platform!</h1>
@@ -28,13 +45,40 @@
 </div>
 
 <div class="container">
-    <h2>Most Popular Items</h2>
+    <h2>Most Expensive Items</h2>
+  <table>
+  <tr>
+    <th>Item Name</th>
+    <th>Highest Bid</th>
+  </tr>
+
+  {% for listing in e_listings %}
+  
+  <tr>
+    <td><a href="/listing/{{listing[0]}}/{{listing[1]}}">{{listing[0]}}</a></td>
+    <td>{{listing[2]}}</td>
+  </tr>
+  {%- endfor %}
+</table>
+
+    <h2> Most Popular Items</h2>
+<table>
+  <tr>
+    <th>Item Name</th>
+    <th>Number of Bidders</th>
+  </tr>
+
+  {% for listing in p_listings %}
+  
+  <tr>
+    <td><a href="/listing/{{listing[0]}}/{{listing[1]}}">{{listing[0]}}</a></td>
+    <td>{{listing[2]}}</td>
+  </tr>
+  {%- endfor %}
+</table>
+
 </div>
 
-<div>
-    <p>Local Date and Time: {{ moment(current_time).format('LLL') }}</p>
-    <p>This was updated {{ moment(current_time).fromNow(refresh=True) }}</p>
-</div>
 
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
 <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
