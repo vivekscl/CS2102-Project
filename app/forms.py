@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, DecimalField, BooleanField, PasswordField, FileField
+from wtforms import StringField, SubmitField, DecimalField, BooleanField, PasswordField, FileField, SelectField
 from wtforms.fields.html5 import DateField, EmailField
 from wtforms.validators import DataRequired, Length, Regexp, EqualTo, ValidationError, Optional, InputRequired, Email
 from models import user
@@ -49,9 +49,10 @@ class SignUpForm(FlaskForm):
             raise ValidationError("Username already in use")
 
 
-
 class SearchForm(FlaskForm):
-    search = StringField("", validators=[Optional()])
+    choices = [('all', 'All'), ('item', 'Item'), ('owner', 'Owner'), ('tag', 'Tag')]
+    select = SelectField('', choices=choices)
+    search = StringField('', validators=[Optional()])
 
 
 class SearchByOwnerForm(FlaskForm):

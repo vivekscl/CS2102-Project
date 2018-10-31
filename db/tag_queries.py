@@ -47,6 +47,6 @@ def delete_tag(tag_id):
 def get_listings_by_tag_name(tag_name):
     with DatabaseCursor() as cursor:
         current_app.logger.info("Getting listings under tag with name {}".format(tag_name))
-        cursor.execute('SELECT * FROM listing WHERE listing_id IN '
-                       '(SELECT listing_id FROM listing_tag WHERE tag_id = (SELECT tag_id FROM tag WHERE name = %s));', (tag_name,))
+        cursor.execute('SELECT * FROM listing WHERE listing_name IN '
+                       '(SELECT listing_name FROM listing_tag WHERE tag_id = (SELECT tag_id FROM tag WHERE name = %s));', (tag_name,))
         return cursor.fetchall()

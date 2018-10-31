@@ -1,5 +1,5 @@
 import os
-from app import create_app, ItemForm, LoginForm, SignUpForm, BidForm, GenerateLoanForm, login_manager, SearchForm, SearchByOwnerForm
+from app import create_app, ItemForm, LoginForm, SignUpForm, BidForm, GenerateLoanForm, login_manager, SearchForm
 from flask_login import login_required, logout_user, login_user, current_user
 from models import user as user_model, listing as listing_model, bid as bid_model, loan as loan_model, tag as tag_model, listing_tag as listing_tag_model
 from werkzeug.security import generate_password_hash
@@ -90,21 +90,6 @@ def register():
     return render_template('register.html', form=form)
 
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    expensive_listings = listing_model.get_expensive_listings()
-    popular_listings = listing_model.get_popular_listings()
-    
-    form = SearchForm()
-    form2 = SearchByOwnerForm()
-    if form.validate_on_submit():
-        return redirect(url_for('search_results', query=form.search.data))
-    if form2.validate_on_submit():
-        return redirect(url_for('search_results_owner', query=form2.search.data))
-    return render_template('index.html', form=form, form2=form2, current_time=datetime.utcnow(),
-                           e_listings=expensive_listings, p_listings=popular_listings)
-
-
 @app.route('/user', methods=['GET'])
 @login_required
 def user_page():
@@ -122,23 +107,40 @@ def user_page():
     return render_template('user.html', available=available, not_available=not_available, loans=loans)
 
 
-@app.route('/search_results', defaults={'query': ''})
-@app.route('/search_results/<string:query>')
-def search_results(query):
-    if not query:
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    expensive_listings = listing_model.get_expensive_listings()
+    popular_listings = listing_model.get_popular_listings()
+
+    form = SearchForm()
+    if request.method == 'POST' and form.validate_on_submit():
+        return redirect(url_for('search_results', type=form.select.data, query=form.search.data))
+
+    return render_template('index.html', form=form, current_time=datetime.utcnow(),
+                           e_listings=expensive_listings, p_listings=popular_listings)
+
+
+@app.route('/search_results', defaults={'type': '', 'query': ''})
+@app.route('/search_results/<string:type>/<string:query>')
+def search_results(type, query):
+
+    if type == 'all' and not query:
         listing = listing_model.get_all_listing()
-    else:
+    elif type == 'tag':
         listing = listing_model.get_listings_by_tag_name(query)
+    elif type == 'owner':
+        listing = listing_model.get_listings_by_owner_name(query)
+    else:
+        flash('No results found!')
+
     return render_template('search_results.html', listing=listing)
 
-
-@app.route('/search_results_owner/<query>', methods=['GET'])
-def search_results_owner(query):
-    if not query:
-        listing = listing_model.get_all_listing()
-    else:
-        listing = listing_model.get_listings_by_owner_name(query)
-    return render_template('search_results_owner.html', listing=listing)
+    # if not listing:
+    #     flash('No results found!')
+    #     return redirect('/')
+    # else:
+    #     # display results
+    #     return render_template('search_results.html', listing=listing)
     
 
 @app.route('/listing/create', methods=['GET', 'POST'])

@@ -5,6 +5,7 @@
 
 <div class="page-header">
     <h1>Search Results</h1>
+    <p>About 7 results</p>
 </div>
 
 <div>
@@ -12,7 +13,11 @@
         {% for listing in listing %}
             <div>
                 <div class="panel panel-default">
-                    <div class="panel-heading"><h4><a href='{{ url_for('listing_details', listing_id=listing.listing_id)}}'>{{ listing.name }}</a></h4></div>
+                    <div class="panel-heading">
+                        <h4>
+                            <a href="{{ url_for('listing_details', listing_name=listing.listing_name, owner_id=listing.owner_id)}}">{{ listing.listing_name }}</a>
+                        </h4>
+                    </div>
                     <div class="panel-body">
                         <p>{{ listing.description }}</p>
                         <p>Owned By:</p>
