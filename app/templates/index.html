@@ -25,8 +25,7 @@ tr:nth-child(even) {
 </div>
 
 <!--Search Fields-->
-<form action="" method="POST" role="form">
-    {{ form.csrf_token }}
+<form action="{{ url_for('search_results') }}" method="POST">
     <div class="input-group">
         <div class="input-group-btn search-panel">
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
@@ -40,7 +39,8 @@ tr:nth-child(even) {
               <li><a href="#all">All</a></li>
             </ul>
         </div>
-        {{ wtf.quick_form(form) }}
+        <input type="hidden" name="search_param" value="all" id="search_param">
+        <input type="text" class="form-control" name="x" placeholder="Search">
         <span class="input-group-btn">
             <button class="btn btn-default" type="submit">
                 <span class="glyphicon glyphicon-search"></span>

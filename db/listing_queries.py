@@ -64,7 +64,10 @@ def get_listings_under_owner(owner_id):
 def get_listings_by_owner_name(owner_name):
     with DatabaseCursor() as cursor:
         current_app.logger.info("Getting listings under user with name {}".format(owner_name))
-        cursor.execute('SELECT * FROM listing WHERE owner_id IN (SELECT id FROM users WHERE name = %s)', (owner_name,))
+        cursor.execute("SELECT * FROM listing WHERE owner_id IN "
+                       "(SELECT id FROM users WHERE LOWER(name) LIKE %s ESCAPE '' "
+                       "OR LOWER(username) LIKE %s ESCAPE '')  ORDER BY listed_date DESC",
+                       (owner_name.lower(), owner_name.lower(),))
         return cursor.fetchall()
 
 

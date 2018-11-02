@@ -2,10 +2,34 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 {% block page_content %}
-
+<div id="search-form">
+    <form action="{{ url_for('search_results') }}" method="POST">
+        <div class="input-group">
+            <div class="input-group-btn search-panel">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    <span id="search_concept">Filter by</span> <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="#item">Item</a></li>
+                  <li><a href="#owner">Owner</a></li>
+                  <li><a href="#tag">Tag</a></li>
+                  <li class="divider"></li>
+                  <li><a href="#all">All</a></li>
+                </ul>
+            </div>
+            <input type="hidden" name="search_param" value="all" id="search_param">
+            <input type="text" class="form-control" name="x" placeholder="Search">
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="submit">
+                    <span class="glyphicon glyphicon-search"></span>
+                </button>
+            </span>
+        </div>
+    </form>
+</div>
 <div class="page-header">
     <h1>Search Results</h1>
-    <p>About 7 results</p>
+    <p>About 7 results. Showing the latest first.</p>
 </div>
 
 <div>
@@ -20,12 +44,12 @@
                     </div>
                     <div class="panel-body">
                         <p>{{ listing.description }}</p>
-                        <p>Owned By:</p>
                         <p>
                             <span class="label label-primary">Primary Label</span>
                             <span class="label label-primary">Primary Label</span>
                         </p>
                     </div>
+                    <div class="panel-footer">Posted on: {{ moment(listing.listed_date).format('LLL') }} | Owned by: Cassey</div>
                 </div>
             </div>
         {% endfor %}

@@ -112,11 +112,11 @@ def index():
     expensive_listings = listing_model.get_expensive_listings()
     popular_listings = listing_model.get_popular_listings()
 
-    form = SearchForm()
-    if request.method == 'POST' and form.validate_on_submit():
-        return redirect(url_for('search_results', type=form.select.data, query=form.search.data))
+    # form = SearchForm()
+    # if request.method == 'POST' and form.validate_on_submit():
+    #     return redirect(url_for('search_results', type=form.select.data, query=form.search.data))
 
-    return render_template('index.html', form=form, current_time=datetime.utcnow(),
+    return render_template('index.html', current_time=datetime.utcnow(),
                            e_listings=expensive_listings, p_listings=popular_listings)
 
 
@@ -134,13 +134,6 @@ def search_results(type, query):
         flash('No results found!')
 
     return render_template('search_results.html', listing=listing)
-
-    # if not listing:
-    #     flash('No results found!')
-    #     return redirect('/')
-    # else:
-    #     # display results
-    #     return render_template('search_results.html', listing=listing)
     
 
 @app.route('/listing/create', methods=['GET', 'POST'])
