@@ -23,4 +23,9 @@ class Tag:
         name = name if name is not None else self.name
         return tag_queries.update_tag(self.tag_id, name)
 
+def get_all_tags():
+    rows = tag_queries.get_all_tags()
+    if rows is None:
+        return None
+    return [Tag(**row) for row in rows]
 

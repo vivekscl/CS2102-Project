@@ -93,13 +93,13 @@ def register():
 @app.route('/user', methods=['GET'])
 @login_required
 def user_page():
-    listings = listing_model.get_listings_under_owner(current_user.id)
+    listings = listing_model.get_listings_with_tags(current_user.id)
     loans = loan_model.get_loans_under_bidder(current_user.id)
     available = []
     not_available = []
 
-    print(loans)
     for listing in listings:
+        print(listing.tag_name)
         if listing.is_available == 'true':
             available.append(listing)
         else:
@@ -141,19 +141,27 @@ def search_results(type, query):
 def create_listing():
 
     form = ItemForm()
+    current_time=datetime.utcnow()
 
-    # If a post request is sent, validate the form and insert the listing into the db using listing_model
+    # If a post request is sent, validate the form and insert the new listing into the db using listing_model.
     if request.method == 'POST':
         if form.validate_on_submit():
-            listing = listing_model.Listing(None, current_user.id, form.item_name.data, form.description.data)
+            owner_id = current_user.id
+            listing_name = form.item_name.data
+            tag_id = form.tags.data
+            listing = listing_model.Listing(listing_name, owner_id, form.description.data,
+                                            current_time, True)
             if listing.create_listing():
-                flash("New listing added!", "success")
-                return redirect(url_for('index'))
+                # Inserts record to listing_tag table accordingly
+                listing_tag = listing_tag_model.ListingTag(tag_id, listing_name, owner_id)
+                if listing_tag.insert_listing_tag():
+                    flash("Successfully added a new listing.", "success")
+                    return redirect(url_for('index'))
             else:
-                flash('Unable to add the listing!', "error")
+                flash('You have created this listing before, unable to add.', "error")
                 app.logger.warning("Insert failed") # to-do provide error msg for diff insertion error
 
-    return render_template('create_listing.html', form=form, current_time=datetime.utcnow())
+    return render_template('create_listing.html', form=form, current_time=current_time)
 
 
 @app.route('/listing/<string:listing_name>/<int:owner_id>', methods=['GET', 'POST'])

@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, DecimalField, BooleanField, PasswordField, FileField, SelectField
 from wtforms.fields.html5 import DateField, EmailField
 from wtforms.validators import DataRequired, Length, Regexp, EqualTo, ValidationError, Optional, InputRequired, Email
-from models import user
+from models import user, tag
 from datetime import datetime
 
 
@@ -12,8 +12,15 @@ class ItemForm(FlaskForm):
     1. The type of field
     2. The parameters for that field which are the label and validators if any
     """
+    tags = tag.get_all_tags()
+    data_source = []
+    for tag in tags:
+        tuple = (tag.tag_id, tag.name)
+        data_source.append(tuple)
+
     item_name = StringField("Item Name: ", validators=[DataRequired()])
     description = StringField("Description: ", validators=[DataRequired()])
+    tags = SelectField("Choose the most appropriate tag: ", choices=data_source, coerce=int)
     image = FileField("Item Image: ", validators=[Optional()])
     submit = SubmitField("Submit")
 
