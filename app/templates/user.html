@@ -11,19 +11,19 @@
             <div id="listings" class="col-md-8 list-group">
                 {% for listing in available %}
                     <a href="{{ url_for('listing_details', listing_name=listing.listing_name, owner_id=listing.owner_id) }}" class="list-group-item">
-                        Name: {{ listing.listing_name }}, Tag: Book</a>
+                        Name: {{ listing.listing_name }}, Tag: {{ listing.tag_name }}</a>
                 {% endfor %}
             </div>
 
             <div id="loans" class="col-md-8 list-group" style="display:none">
                 {% for listing in loans %}
-                    {# to do #}
+                    <a class="list-group-item">Name: {{ listing.listing_name }}</a>
                 {% endfor %}
             </div>
 
             <div class="col-md-4 btn-toolbar-vertical">
-                <button type="button" class="btn btn-default btn-lg btn-block" value="My Listings">My Listings</button>
-{#                <button type="button" class="btn btn-default btn-lg btn-block" value="Borrowed Items">Borrowed Items</button>#}
+                <button id="listing_btn" type="button" class="btn btn-default btn-lg btn-block">My Listings</button>
+                <button id="loan_btn" type="button" class="btn btn-default btn-lg btn-block">My Loans</button>
                 <button type="button" class="btn btn-default btn-lg btn-block"
                         onclick="window.location.href='{{ url_for('create_listing') }}';">Add New Listing
                 </button>
@@ -46,25 +46,11 @@
         </div>
     </div>
 
-{#    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>#}
-{#    <script type="text/javascript">#}
-{#        $(document).ready(function () {#}
-{#             $(".change-view").click(function() {#}
-{#                 var button_val = $(this).val();#}
-{#                 if (button_val != "My Listings") {   // My Loans#}
-{#                     $('#title1').text(button_val);#}
-{#                     $('#sub-content').hide();#}
-{#                     $('#listings').hide();#}
-{#                     $('#loans').show();#}
-{#                 } else {   // My Listings#}
-{#                     $('#title1').text("Available For Bidding");#}
-{#                     $('#loans').hide();#}
-{#                     $('#listings').show();#}
-{#                     $('#sub-content').show();#}
-{#                 }#}
-{#             });#}
-{#        });#}
-{#    </script>#}
-
 {% endblock %}
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="javascript">
+    $("#loan_btn").click(function() {
+        $("#loans").toggle();
+    });
+</script>
