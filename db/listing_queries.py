@@ -88,3 +88,12 @@ def get_expensive_listings():
                           order by max(price) desc
                           limit 5''')
         return cursor.fetchall()
+
+
+def get_listings_with_tags(owner_id):
+    with DatabaseCursor() as cursor:
+        cursor.execute('''select l.listing_name, l.owner_id, l.description, lt.tag_id, tag.name AS tag_name,
+                        l.is_available, l.listed_date from listing l inner join listing_tag lt on l.listing_name = lt.listing_name
+                        and l.owner_id = lt.owner_id inner join tag tag on lt.tag_id = tag.tag_id 
+                        and l.owner_id = %s''', (owner_id,))
+        return cursor.fetchall()

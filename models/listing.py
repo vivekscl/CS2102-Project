@@ -83,3 +83,21 @@ def get_expensive_listings():
 # extract top 'number' listings if there exists
 def get_popular_listings():
     return listing_queries.get_popular_listings()
+
+# Custom class for inner join query to return listing with tag name
+class ListingWithTagName:
+    def __init__(self, listing_name, owner_id, description, tag_id, tag_name, is_available, listed_date):
+        self.listing_name = listing_name
+        self.owner_id = owner_id
+        self.description = description
+        self.tag_id = tag_id
+        self.tag_name = tag_name
+        self.is_available = is_available
+        self.listed_date = listed_date
+
+# get listings together with tag name
+def get_listings_with_tags(owner_id):
+    rows = listing_queries.get_listings_with_tags(owner_id)
+    if rows is None:
+        return None
+    return [ListingWithTagName(**row) for row in rows]
