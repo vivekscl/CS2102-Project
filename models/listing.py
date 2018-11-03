@@ -138,3 +138,18 @@ def get_listings_by_tag_name(tag_name):
         return after
 
 
+# get listings using listing name
+def get_listings_by_listing_name(listing_name):
+    rows = listing_queries.get_listings_by_listing_name(listing_name)
+    if rows is None:
+        return None
+    else:
+        prev = [ListingForSearch(**row) for row in rows]
+        after = []
+        for i, elem in enumerate(prev):
+            if elem not in after:
+                after.append(elem)
+            else:
+                num = after.index(elem)
+                after[num].tag_name += "," + elem.tag_name
+        return after

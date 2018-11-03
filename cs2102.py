@@ -126,6 +126,8 @@ def search_results(type, query):
 
     if type == 'all':
         listing = listing_model.get_all_listing()
+    elif type == 'item':
+        listing = listing_model.get_listings_by_listing_name('%' + query + '%')
     elif type == 'tag':
         listing = listing_model.get_listings_by_tag_name('%' + query + '%')
     elif type == 'owner':
