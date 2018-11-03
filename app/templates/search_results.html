@@ -2,34 +2,13 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 {% block page_content %}
-<div id="search-form">
-    <form action="{{ url_for('search_results') }}" method="POST">
-        <div class="input-group">
-            <div class="input-group-btn search-panel">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                    <span id="search_concept">Filter by</span> <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu" role="menu">
-                  <li><a href="#item">Item</a></li>
-                  <li><a href="#owner">Owner</a></li>
-                  <li><a href="#tag">Tag</a></li>
-                  <li class="divider"></li>
-                  <li><a href="#all">All</a></li>
-                </ul>
-            </div>
-            <input type="hidden" name="search_param" value="all" id="search_param">
-            <input type="text" class="form-control" name="x" placeholder="Search">
-            <span class="input-group-btn">
-                <button class="btn btn-default" type="submit">
-                    <span class="glyphicon glyphicon-search"></span>
-                </button>
-            </span>
-        </div>
-    </form>
-</div>
+{% include "search_bar.html" %}
+
 <div class="page-header">
     <h1>Search Results</h1>
-    <p>About 7 results. Showing the latest first.</p>
+    {% if listing is defined and listing|length > 0 %}
+        <p>About {{ listing|length }} results. Showing the latest first.</p>
+    {% endif %}
 </div>
 
 <div>
@@ -44,12 +23,16 @@
                     </div>
                     <div class="panel-body">
                         <p>{{ listing.description }}</p>
-                        <p>
-                            <span class="label label-primary">Primary Label</span>
-                            <span class="label label-primary">Primary Label</span>
-                        </p>
+                        {% if listing.tag_name is not none %}
+                            <p>
+                                {% set tags = listing.tag_name.split(',') %}
+                                {% for tag in tags %}
+                                        <span class="label label-primary">{{ tag }}</span>
+                                {% endfor %}
+                            </p>
+                        {% endif %}
                     </div>
-                    <div class="panel-footer">Posted on: {{ moment(listing.listed_date).format('LLL') }} | Owned by: Cassey</div>
+                    <div class="panel-footer">Posted on: {{ moment(listing.listed_date).format('LLL') }} | Owned by: <a>{{ listing.user_name }}</a></div>
                 </div>
             </div>
         {% endfor %}

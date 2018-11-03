@@ -124,12 +124,12 @@ def index():
 @app.route('/search_results/<string:type>/<string:query>')
 def search_results(type, query):
 
-    if type == 'all' and not query:
+    if type == 'all':
         listing = listing_model.get_all_listing()
     elif type == 'tag':
-        listing = listing_model.get_listings_by_tag_name(query)
+        listing = listing_model.get_listings_by_tag_name('%' + query + '%')
     elif type == 'owner':
-        listing = listing_model.get_listings_by_owner_name(query)
+        listing = listing_model.get_listings_by_owner_name('%' + query + '%')
     else:
         flash('No results found!')
 
