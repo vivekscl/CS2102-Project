@@ -1,5 +1,5 @@
 import os
-from app import create_app, ItemForm, LoginForm, SignUpForm, BidForm, GenerateLoanForm, login_manager, SearchForm
+from app import create_app, ItemForm, LoginForm, SignUpForm, BidForm, GenerateLoanForm, login_manager
 from flask_login import login_required, logout_user, login_user, current_user
 from models import user as user_model, listing as listing_model, bid as bid_model, loan as loan_model, tag as tag_model, listing_tag as listing_tag_model
 from werkzeug.security import generate_password_hash
@@ -112,20 +112,23 @@ def index():
     expensive_listings = listing_model.get_expensive_listings()
     popular_listings = listing_model.get_popular_listings()
 
-    # form = SearchForm()
-    # if request.method == 'POST' and form.validate_on_submit():
-    #     return redirect(url_for('search_results', type=form.select.data, query=form.search.data))
+    if request.method == 'POST':
+        return redirect(url_for('search_results', type=request.form.get('search_param'),
+                                query=request.form.get('search_query')))
 
     return render_template('index.html', current_time=datetime.utcnow(),
                            e_listings=expensive_listings, p_listings=popular_listings)
 
 
-@app.route('/search_results', defaults={'type': '', 'query': ''})
-@app.route('/search_results/<string:type>/<string:query>')
+@app.route('/search_results/<string:type>/<string:query>', methods=['GET', 'POST'])
 def search_results(type, query):
 
+    if request.method == 'POST':
+        return redirect(url_for('search_results', type=request.form.get('search_param'),
+                                query=request.form.get('search_query')))
+
     if type == 'all':
-        listing = listing_model.get_all_listing()
+        listing = listing_model.get_listings_by_all('%' + query + '%')
     elif type == 'item':
         listing = listing_model.get_listings_by_listing_name('%' + query + '%')
     elif type == 'tag':

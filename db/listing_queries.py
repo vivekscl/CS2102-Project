@@ -111,7 +111,28 @@ def get_listings_by_owner_name(owner_name):
                        "ORDER BY listed_date DESC;",
                        (owner_name, owner_name,))
         return cursor.fetchall()
-    # CHECK WHETHER ESCAPE IS IN THE CORRECT PLACE
+
+
+# for search queries by all kinds of entries
+def get_listings_by_all(all_entries):
+    with DatabaseCursor() as cursor:
+        current_app.logger.info("Getting listings under all entries with query {}".format(all_entries))
+        cursor.execute("SELECT l.listing_name, u.name AS user_name, l.description, l.listed_date, "
+                       "tag.name AS tag_name, l.owner_id FROM listing l "
+                       "LEFT JOIN listing_tag lt ON l.listing_name = lt.listing_name AND l.owner_id = lt.owner_id "
+                       "LEFT JOIN tag AS tag ON lt.tag_id = tag.tag_id "
+                       "LEFT JOIN users AS u ON l.owner_id = u.id "
+                       "WHERE l.owner_id IN (SELECT u2.id FROM users u2 WHERE LOWER(name) "
+                       "LIKE LOWER(%s) OR LOWER(username) LIKE LOWER(%s)) "
+                       "OR l.listing_name IN (SELECT lt2.listing_name FROM listing_tag lt2 "
+                       "WHERE tag_id IN (SELECT tag2.tag_id FROM tag tag2 WHERE LOWER(name) LIKE LOWER(%s))) "
+                       "AND l.owner_id IN (SELECT lt2.owner_id FROM listing_tag lt2 "
+                       "WHERE tag_id IN (SELECT tag2.tag_id FROM tag tag2 WHERE LOWER(name) LIKE LOWER(%s))) "
+                       "OR LOWER(l.listing_name) LIKE LOWER(%s) "
+                       "GROUP BY l.listing_name, u.name, l.description, l.listed_date, tag.name, l.owner_id "
+                       "ORDER BY listed_date DESC;",
+                       (all_entries, all_entries, all_entries, all_entries, all_entries,))
+        return cursor.fetchall()
 
 
 def get_popular_listings():

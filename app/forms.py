@@ -56,16 +56,6 @@ class SignUpForm(FlaskForm):
             raise ValidationError("Username already in use")
 
 
-class SearchForm(FlaskForm):
-    choices = [('all', 'All'), ('item', 'Item'), ('owner', 'Owner'), ('tag', 'Tag')]
-    select = SelectField('', choices=choices)
-    search = StringField('', validators=[Optional()])
-
-
-class SearchByOwnerForm(FlaskForm):
-    search = StringField("", validators=[Optional()])
-
-
 class BidForm(FlaskForm):
     price = DecimalField('Price: ', validators=[DataRequired()])
     submit = SubmitField("Add your bid")

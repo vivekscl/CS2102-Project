@@ -153,3 +153,20 @@ def get_listings_by_listing_name(listing_name):
                 num = after.index(elem)
                 after[num].tag_name += "," + elem.tag_name
         return after
+
+
+# get listings using all kinds of entries
+def get_listings_by_all(all):
+    rows = listing_queries.get_listings_by_all(all)
+    if rows is None:
+        return None
+    else:
+        prev = [ListingForSearch(**row) for row in rows]
+        after = []
+        for i, elem in enumerate(prev):
+            if elem not in after:
+                after.append(elem)
+            else:
+                num = after.index(elem)
+                after[num].tag_name += "," + elem.tag_name
+        return after
