@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, DecimalField, BooleanField, PasswordField, FileField, SelectField
+from wtforms import StringField, SubmitField, DecimalField, BooleanField, PasswordField, FileField, SelectMultipleField
 from wtforms.fields.html5 import DateField, EmailField
 from wtforms.validators import DataRequired, Length, Regexp, EqualTo, ValidationError, Optional, InputRequired, Email
 from models import user, tag
@@ -20,7 +20,7 @@ class ItemForm(FlaskForm):
 
     item_name = StringField("Item Name: ", validators=[DataRequired()])
     description = StringField("Description: ", validators=[DataRequired()])
-    tags = SelectField("Choose the most appropriate tag: ", choices=data_source, coerce=int)
+    tags = SelectMultipleField("Choose the most appropriate tags: ", choices=data_source, coerce=int, validators=[Optional()])
     image = FileField("Item Image: ", validators=[Optional()])
     submit = SubmitField("Submit")
 
@@ -44,6 +44,29 @@ class SignUpForm(FlaskForm):
     confirm_password = PasswordField("Confirm Password:", validators=[DataRequired()])
     phonenumber = StringField("Phone Number (optional): ", validators=[Optional(), Length(8)])
     submit = SubmitField("Sign Up")
+
+    def validate_username(self, field):
+        """
+        FlaskWTF automatically uses this validator on the form field that has the same name as the word after validate_
+        in the function name.
+        :param field:
+        :return:
+        """
+        if user.get_user_by_username(field.data):
+            raise ValidationError("Username already in use")
+
+
+class EditProfileForm(FlaskForm):
+    name = StringField("Name: ", validators=[DataRequired(), Length(1, 128)])
+    username = StringField("Username: ", validators=[DataRequired(), Length(1, 128),
+                                                     Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,
+                                                            'Usernames must only have letters numbers, dots or '
+                                                            'underscores')])
+    email = EmailField("Email Address: ", validators=[DataRequired(), Email()])
+    old_password = PasswordField("Old Password :", validators=[DataRequired()])
+    new_password = PasswordField("New Password :", validators=[DataRequired()])
+    phone_no = StringField("Phone Number (optional): ", validators=[Optional(), Length(8)])
+    submit = SubmitField("Save Changes")
 
     def validate_username(self, field):
         """

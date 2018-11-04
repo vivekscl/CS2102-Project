@@ -1,11 +1,10 @@
 import os
-from app import create_app, ItemForm, LoginForm, SignUpForm, BidForm, GenerateLoanForm, login_manager
+from app import create_app, ItemForm, LoginForm, SignUpForm, EditProfileForm, BidForm, GenerateLoanForm, login_manager
 from flask_login import login_required, logout_user, login_user, current_user
 from models import user as user_model, listing as listing_model, bid as bid_model, loan as loan_model, tag as tag_model, listing_tag as listing_tag_model
 from werkzeug.security import generate_password_hash
 from flask import render_template, redirect, url_for, g, flash, request
 from datetime import datetime
-from db import DatabaseCursor
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 
@@ -99,7 +98,6 @@ def user_page():
     not_available = []
 
     for listing in listings:
-        print(listing.tag_name)
         if listing.is_available == 'true':
             available.append(listing)
         else:
@@ -113,8 +111,8 @@ def index():
     popular_listings = listing_model.get_popular_listings()
 
     if request.method == 'POST':
-        print 'search type: ' + request.form.get('search_param')
-        print 'search query: ' + request.form.get('search_query')
+        #print 'search type: ' + request.form.get('search_param')
+        #print 'search query: ' + request.form.get('search_query')
         return redirect(url_for('search_results', type=request.form.get('search_param'),
                                 query='%' + request.form.get('search_query') + '%'))
 
@@ -133,7 +131,7 @@ def search_results(type, query):
     elif type == 'listing':
         listing = listing_model.get_listings_by_listing_name(query)
     elif type == 'tag':
-        listing = listing_model.get_listings_by_tag_name(query)
+      listing = listing_model.get_listings_by_tag_name(query)
     elif type == 'owner':
         listing = listing_model.get_listings_by_owner_name(query)
     else:
@@ -141,6 +139,26 @@ def search_results(type, query):
 
     return render_template('search_results.html', listing=listing)
 
+
+@app.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+
+    user = user_model.get_user_by_id(current_user.id)
+    form = EditProfileForm(obj=user)
+
+    if request.method == 'POST' and form.validate_on_submit():
+        old_password = form.old_password.data
+        if user.verify_password(old_password):  # if user is successfully verified
+            user.update_user_info(form.username.data, form.email.data, form.name.data,
+                                  generate_password_hash(form.new_password.data), form.phone_no.data)
+            flash("Profile updated!", "success")
+            return redirect(url_for('index'))
+        else:
+            flash("Incorrect password! Please try again.", "error")
+
+    return render_template('edit_profile.html', form=form)
+        
 
 @app.route('/user_profile/<string:username>', methods=['GET'])
 def user_profile(username):
@@ -161,21 +179,50 @@ def create_listing():
     if request.method == 'POST':
         if form.validate_on_submit():
             owner_id = current_user.id
-            listing_name = form.item_name.data
-            tag_id = form.tags.data
+            listing_name = form.item_name.data.strip()
+            tag_ids = form.tags.data
             listing = listing_model.Listing(listing_name, owner_id, form.description.data,
                                             current_time, True)
             if listing.create_listing():
-                # Inserts record to listing_tag table accordingly
-                listing_tag = listing_tag_model.ListingTag(tag_id, listing_name, owner_id)
-                if listing_tag.insert_listing_tag():
-                    flash("Successfully added a new listing.", "success")
-                    return redirect(url_for('index'))
+                # Inserts every listing_tag record accordingly based on what user selected
+                for id in tag_ids:
+                    listing_tag = listing_tag_model.ListingTag(id, listing_name, owner_id)
+                    if not listing_tag.insert_listing_tag():
+                        flash('Unable to update selected tags with listing.', 'error')
+
+                flash("Successfully added a new listing.", "success")
+                return redirect(url_for('index'))
             else:
                 flash('You have created this listing before, unable to add.', "error")
                 app.logger.warning("Insert failed") # to-do provide error msg for diff insertion error
 
     return render_template('create_listing.html', form=form, current_time=current_time)
+
+
+@app.route('/listing/<string:listing_name>/<int:owner_id>/edit', methods=['POST'])
+def edit_listing(listing_name, owner_id):
+
+    if request.method == 'POST':
+        description = request.form['description']
+        tags = request.form.getlist('tags')
+
+        listing = listing_model.get_listing(listing_name, owner_id)  # get listing
+        if listing.update_listing(description=description):   # update listing
+            listing_tag_model.delete_listing_tags(listing_name, owner_id)  # delete all associated listing tags first
+            if len(tags) != 0:
+                for id in tags:
+                    listing_tag = listing_tag_model.ListingTag(id, listing_name, owner_id)
+                    if not listing_tag.insert_listing_tag():
+                        flash("Something went wrong with tag update..", "error")
+                        return redirect(url_for('listing_details', listing_name=listing_name, owner_id=owner_id))
+
+            flash("Successfully updated listing.", 'success')
+            return redirect(url_for('listing_details', listing_name=listing_name, owner_id=owner_id))
+
+        flash("Update went wrong.", "error")
+        return redirect(url_for('listing_details', listing_name=listing_name, owner_id=owner_id))
+
+
 
 
 @app.route('/listing/<string:listing_name>/<int:owner_id>', methods=['GET', 'POST'])
@@ -189,6 +236,7 @@ def listing_details(listing_name, owner_id):
     # check if avail is false then redirect depending on whether the user is the owner or not
     listing = listing_model.get_listing(listing_name, owner_id)
     owner = user_model.get_user_by_id(owner_id)
+    tag_ids = listing_tag_model.get_tagids_under_listing(listing_name, owner_id)
 
     if request.method == 'POST':
         if not current_user.is_authenticated:  # check if user is logged in to send a post request
@@ -210,7 +258,8 @@ def listing_details(listing_name, owner_id):
                 flash("Placing of bid has failed", "error")
 
         return redirect(url_for('listing_details', listing_name=listing_name, owner_id=owner_id))
-    return render_template('listing.html', listing=listing, bids_under_this_listing=bids, owner=owner, form=form)
+    return render_template('listing.html', listing=listing, tag_ids=tag_ids, bids_under_this_listing=bids,
+                           owner=owner, form=form)
 
 
 @app.route('/generate_loan/<int:bidder_id>/<string:listing_name>/<int:owner_id>', methods=['GET', 'POST'])

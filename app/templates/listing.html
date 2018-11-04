@@ -15,6 +15,9 @@
         <h3 class="media-heading">{{ listing.name }}</h3>
         <h4>Owned By: {{ owner.name }}</h4>
         <p>Description: {{ listing.description }}</p>
+        {% if current_user.is_authenticated and current_user.id == owner.id %}
+            <a data-target="#editListingModal" data-toggle="modal" href="#editListingModal">Edit Listing</a>
+        {% endif %}
       </div>
     </div>
 
@@ -67,6 +70,7 @@
                      data-placement="bottom" title="You must be logged in to bid">Bid for this item!</button>
         </div>
     {% endif %}
+    {% include 'edit_listing_modal.html' %}
     {% include 'bid_modal.html' %}
     {% include 'update_bid_modal.html' %}
 {% endblock %}
