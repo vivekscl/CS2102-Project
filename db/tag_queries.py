@@ -4,16 +4,19 @@ import psycopg2
 
 # This script contains all queries for the tag table
 
+
 def get_all_tags():
     with DatabaseCursor() as cursor:
         cursor.execute('SELECT * FROM tag;')
         return cursor.fetchall()
+
 
 def get_tag_by_id(tag_id):
     with DatabaseCursor() as cursor:
         current_app.logger.info("Getting tag with tag ID {} from database".format(tag_id))
         cursor.execute('select * from tag where tag_id = %s;', (tag_id,))
         return cursor.fetchone()
+
 
 def insert_tag(name):
     try:
@@ -47,13 +50,6 @@ def delete_tag(tag_id):
         cursor.execute("delete from tag where tag_id = %s", tag_id)
 
 
-def get_listings_by_tag_name(tag_name):
-    with DatabaseCursor() as cursor:
-        current_app.logger.info("Getting listings under tag with name {}".format(tag_name))
-        cursor.execute('SELECT * FROM listing WHERE listing_id IN '
-                       '(SELECT listing_id FROM listing_tag WHERE tag_id = (SELECT tag_id FROM tag WHERE name = %s));', (tag_name,))
-        return cursor.fetchall()
-
 
 def insert_listing_tag(tag_id, listing_name, owner_id):
     try:
@@ -63,6 +59,17 @@ def insert_listing_tag(tag_id, listing_name, owner_id):
     except psycopg2.IntegrityError:
         current_app.logger.error("listing_tag insertion failed: [{}]".format(listing_name))
         return False
+
+
+def get_most_common_tag_of_owner(owner_name):
+    with DatabaseCursor() as cursor:
+        current_app.logger.info("Getting most common tag name of owner name {} from database".format(owner_name))
+        cursor.execute("SELECT tag.name AS tag_name, COUNT(lt.tag_id) AS count FROM listing_tag lt "
+                       "LEFT JOIN tag AS tag ON lt.tag_id = tag.tag_id "
+                       "WHERE lt.owner_id = (SELECT u.id FROM users u WHERE u.username = %s) "
+                       "GROUP BY tag.name ORDER BY count DESC LIMIT 1;",
+                       (owner_name,))
+        return cursor.fetchone()
 
 
 def get_tagids_under_listing(listing_name, owner_id):

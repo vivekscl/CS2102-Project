@@ -1,5 +1,5 @@
 import os
-from app import create_app, ItemForm, LoginForm, SignUpForm, EditProfileForm, BidForm, GenerateLoanForm, login_manager, SearchForm, SearchByOwnerForm
+from app import create_app, ItemForm, LoginForm, SignUpForm, EditProfileForm, BidForm, GenerateLoanForm, login_manager
 from flask_login import login_required, logout_user, login_user, current_user
 from models import user as user_model, listing as listing_model, bid as bid_model, loan as loan_model, tag as tag_model, listing_tag as listing_tag_model
 from werkzeug.security import generate_password_hash
@@ -89,21 +89,6 @@ def register():
     return render_template('register.html', form=form)
 
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    expensive_listings = listing_model.get_expensive_listings()
-    popular_listings = listing_model.get_popular_listings()
-    
-    form = SearchForm()
-    form2 = SearchByOwnerForm()
-    if form.validate_on_submit():
-        return redirect(url_for('search_results', query=form.search.data))
-    if form2.validate_on_submit():
-        return redirect(url_for('search_results_owner', query=form2.search.data))
-    return render_template('index.html', form=form, form2=form2, current_time=datetime.utcnow(),
-                           e_listings=expensive_listings, p_listings=popular_listings)
-
-
 @app.route('/user', methods=['GET'])
 @login_required
 def user_page():
@@ -118,6 +103,41 @@ def user_page():
         else:
             not_available.append(listing)
     return render_template('user.html', available=available, not_available=not_available, loans=loans)
+
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    expensive_listings = listing_model.get_expensive_listings()
+    popular_listings = listing_model.get_popular_listings()
+
+    if request.method == 'POST':
+        #print 'search type: ' + request.form.get('search_param')
+        #print 'search query: ' + request.form.get('search_query')
+        return redirect(url_for('search_results', type=request.form.get('search_param'),
+                                query='%' + request.form.get('search_query') + '%'))
+
+    return render_template('index.html', current_time=datetime.utcnow(),
+                           e_listings=expensive_listings, p_listings=popular_listings)
+
+
+@app.route('/search_results/<string:type>/<string:query>', methods=['GET', 'POST'])
+def search_results(type, query):
+
+    if request.method == 'POST':
+        return redirect(url_for('search_results', type=request.form.get('search_param'),
+                                query='%' + request.form.get('search_query') + '%'))
+    if type == 'all':
+        listing = listing_model.get_listings_by_all(query)
+    elif type == 'listing':
+        listing = listing_model.get_listings_by_listing_name(query)
+    elif type == 'tag':
+      listing = listing_model.get_listings_by_tag_name(query)
+    elif type == 'owner':
+        listing = listing_model.get_listings_by_owner_name(query)
+    else:
+        flash('No results found!')
+
+    return render_template('search_results.html', listing=listing)
 
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
@@ -138,25 +158,14 @@ def edit_profile():
             flash("Incorrect password! Please try again.", "error")
 
     return render_template('edit_profile.html', form=form)
+        
 
-
-@app.route('/search_results', defaults={'query': ''})
-@app.route('/search_results/<string:query>')
-def search_results(query):
-    if not query:
-        listing = listing_model.get_all_listing()
-    else:
-        listing = listing_model.get_listings_by_tag_name(query)
-    return render_template('search_results.html', listing=listing)
-
-
-@app.route('/search_results_owner/<query>', methods=['GET'])
-def search_results_owner(query):
-    if not query:
-        listing = listing_model.get_all_listing()
-    else:
-        listing = listing_model.get_listings_by_owner_name(query)
-    return render_template('search_results_owner.html', listing=listing)
+@app.route('/user_profile/<string:username>', methods=['GET'])
+def user_profile(username):
+    listing = listing_model.get_listings_by_owner_name(username)
+    user = user_model.get_user_by_username(username)
+    most_common_tag = listing_tag_model.get_most_common_tag_of_owner(username)
+    return render_template('user_profile.html', user=user, listing=listing, most_common_tag=most_common_tag)
     
 
 @app.route('/listing/create', methods=['GET', 'POST'])

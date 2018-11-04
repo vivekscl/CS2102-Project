@@ -50,20 +50,6 @@ def get_all_listing():
     return [Listing(**row) for row in rows]
 
 
-def get_listings_by_owner_name(owner_name):
-    rows = listing_queries.get_listings_by_owner_name(owner_name)
-    if rows is None:
-        return None
-    return [Listing(**row) for row in rows]
-
-
-def get_listings_by_tag_name(tag_name):
-    rows = tag_queries.get_listings_by_tag_name(tag_name)
-    if rows is None:
-        return None
-    return [Listing(**row) for row in rows]
-
-
 def get_listings_owner_id():
     with DatabaseCursor() as cursor:
         cursor.execute('''select * 
@@ -83,7 +69,8 @@ def get_popular_listings():
     return listing_queries.get_popular_listings()
 
 
-# Custom class for inner join query to return listing with their tag names
+
+# Custom class for inner join query to return listing with tag name
 class ListingWithTagName:
 
     def __init__(self, listing_name, owner_id, description, tag_id, tag_name, is_available, listed_date):
@@ -95,10 +82,93 @@ class ListingWithTagName:
         self.is_available = is_available
         self.listed_date = listed_date
 
+
     def __eq__(self, other):
         return self.listing_name == other.listing_name and self.owner_id == other.owner_id
 
 
+class ListingForSearch:
+    def __init__(self, listing_name, user_name, description, listed_date, tag_name, owner_id, username):
+        self.listing_name = listing_name
+        self.owner_id = owner_id
+        self.description = description
+        self.tag_name = tag_name
+        self.listed_date = listed_date
+        self.user_name = user_name
+        self.username = username
+
+    def __eq__(self, other):
+        return self.listing_name == other.listing_name and self.owner_id == other.owner_id
+
+
+# get listings using owner's name
+def get_listings_by_owner_name(owner_name):
+    rows = listing_queries.get_listings_by_owner_name(owner_name)
+    if rows is None:
+        return None
+    else:
+        prev = [ListingForSearch(**row) for row in rows]
+        after = []
+        for i, elem in enumerate(prev):
+            if elem not in after:
+                after.append(elem)
+            else:
+                num = after.index(elem)
+                after[num].tag_name += "," + elem.tag_name
+        return after
+
+
+# get listings using tag name
+def get_listings_by_tag_name(tag_name):
+    rows = listing_queries.get_listings_by_tag_name(tag_name)
+    if rows is None:
+        return None
+    else:
+        prev = [ListingForSearch(**row) for row in rows]
+        after = []
+        for i, elem in enumerate(prev):
+            if elem not in after:
+                after.append(elem)
+            else:
+                num = after.index(elem)
+                after[num].tag_name += "," + elem.tag_name
+        return after
+
+
+# get listings using listing name
+def get_listings_by_listing_name(listing_name):
+    rows = listing_queries.get_listings_by_listing_name(listing_name)
+    if rows is None:
+        return None
+    else:
+        prev = [ListingForSearch(**row) for row in rows]
+        after = []
+        for i, elem in enumerate(prev):
+            if elem not in after:
+                after.append(elem)
+            else:
+                num = after.index(elem)
+                after[num].tag_name += "," + elem.tag_name
+        return after
+
+
+# get listings using all kinds of entries
+def get_listings_by_all(all):
+    rows = listing_queries.get_listings_by_all(all)
+    if rows is None:
+        return None
+    else:
+        prev = [ListingForSearch(**row) for row in rows]
+        after = []
+        for i, elem in enumerate(prev):
+            if elem not in after:
+                after.append(elem)
+            else:
+                num = after.index(elem)
+                after[num].tag_name += "," + elem.tag_name
+        return after
+
+      
 # get listings together with their tags
 def get_listings_with_tags(owner_id):
     rows = listing_queries.get_listings_with_tags(owner_id)
@@ -113,4 +183,5 @@ def get_listings_with_tags(owner_id):
             else:
                 x = after.index(elem)
                 after[x].tag_name += "," + elem.tag_name
+
         return after

@@ -26,25 +26,7 @@ tr:nth-child(even) {
         </div>
     </div>
 
-<!--Search Fields-->
-<div class="input-group" style="margin-top:20px">
-    <div class="input-group-btn search-panel">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-            <span id="search_concept">Filter by</span> <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu" role="menu">
-          <li><a href="#item">Item</a></li>
-          <li><a href="#owner">Owner</a></li>
-          <li><a href="#tag">Tag</a></li>
-        </ul>
-    </div>
-    {{ wtf.quick_form(form) }}
-    <span class="input-group-btn">
-        <button class="btn btn-default" type="button">
-            <span class="glyphicon glyphicon-search"></span>
-        </button>
-    </span>
-</div>
+{% include "search_bar.html" %}
 
 <div class="container">
     <h2>Most Expensive Items</h2>
@@ -80,21 +62,5 @@ tr:nth-child(even) {
 </table>
 
 </div>
-
-
-<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
-<script>
-    $(document).ready(function(e){
-    $('.search-panel .dropdown-menu').find('a').click(function(e) {
-        e.preventDefault();
-        var param = $(this).attr("href").replace("#","");
-        var concept = $(this).text();
-        $('.search-panel span#search_concept').text(concept);
-        $('.input-group #search_param').val(param);
-    });
-});
-</script>
 
 {% endblock %}
