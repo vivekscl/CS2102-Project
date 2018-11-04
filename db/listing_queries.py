@@ -128,12 +128,12 @@ def get_listings_by_all(all_entries):
                        "WHERE tag_id IN (SELECT tag2.tag_id FROM tag tag2 WHERE LOWER(name) LIKE LOWER(%s))) "
                        "AND l.owner_id IN (SELECT lt2.owner_id FROM listing_tag lt2 "
                        "WHERE tag_id IN (SELECT tag2.tag_id FROM tag tag2 WHERE LOWER(name) LIKE LOWER(%s))) "
-                       "OR LOWER(l.listing_name) LIKE LOWER(%s) "
+                       "OR LOWER(l.listing_name) LIKE LOWER(%s) OR LOWER(l.description) LIKE LOWER(%s) "
                        "GROUP BY l.listing_name, u.name, l.description, l.listed_date, tag.name, l.owner_id "
                        "ORDER BY listed_date DESC;",
-                       (all_entries, all_entries, all_entries, all_entries, all_entries,))
+                       (all_entries, all_entries, all_entries, all_entries, all_entries, all_entries,))
         return cursor.fetchall()
-
+#add description
 
 def get_popular_listings():
     with DatabaseCursor() as cursor:

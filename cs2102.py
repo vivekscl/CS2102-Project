@@ -113,8 +113,10 @@ def index():
     popular_listings = listing_model.get_popular_listings()
 
     if request.method == 'POST':
+        print 'search type: ' + request.form.get('search_param')
+        print 'search query: ' + request.form.get('search_query')
         return redirect(url_for('search_results', type=request.form.get('search_param'),
-                                query=request.form.get('search_query')))
+                                query='%' + request.form.get('search_query') + '%'))
 
     return render_template('index.html', current_time=datetime.utcnow(),
                            e_listings=expensive_listings, p_listings=popular_listings)
@@ -125,16 +127,15 @@ def search_results(type, query):
 
     if request.method == 'POST':
         return redirect(url_for('search_results', type=request.form.get('search_param'),
-                                query=request.form.get('search_query')))
-
+                                query='%' + request.form.get('search_query') + '%'))
     if type == 'all':
-        listing = listing_model.get_listings_by_all('%' + query + '%')
+        listing = listing_model.get_listings_by_all(query)
     elif type == 'item':
-        listing = listing_model.get_listings_by_listing_name('%' + query + '%')
+        listing = listing_model.get_listings_by_listing_name(query)
     elif type == 'tag':
-        listing = listing_model.get_listings_by_tag_name('%' + query + '%')
+        listing = listing_model.get_listings_by_tag_name(query)
     elif type == 'owner':
-        listing = listing_model.get_listings_by_owner_name('%' + query + '%')
+        listing = listing_model.get_listings_by_owner_name(query)
     else:
         flash('No results found!')
 
