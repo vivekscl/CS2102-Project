@@ -19,16 +19,14 @@ class Listing:
         return listing_queries.insert_listing(self.listing_name, self.owner_id, self.description, self.listed_date,
                                               self.is_available)
 
-    def update_listing(self, listed_date=None, description=None, is_available=None):
+    def update_listing(self, description=None):
         """
         All params default to None first. In the method they are given the values of the object. If a value is given,
         then only that value is updated while the rest remains the same
         :return: True or False to indicate if the update failed
         """
-        listed_date = listed_date if listed_date is not None else self.listed_date
         description = description if description is not None else self.description
-        is_available = is_available if is_available is not None else self.is_available
-        return listing_queries.update_listing(self.listing_name, self.owner_id, description, listed_date, is_available)
+        return listing_queries.update_listing(self.listing_name, self.owner_id, description)
 
 
 def get_listing(listing_name, owner_id):
@@ -84,8 +82,10 @@ def get_expensive_listings():
 def get_popular_listings():
     return listing_queries.get_popular_listings()
 
-# Custom class for inner join query to return listing with tag name
+
+# Custom class for inner join query to return listing with their tag names
 class ListingWithTagName:
+
     def __init__(self, listing_name, owner_id, description, tag_id, tag_name, is_available, listed_date):
         self.listing_name = listing_name
         self.owner_id = owner_id
@@ -95,9 +95,22 @@ class ListingWithTagName:
         self.is_available = is_available
         self.listed_date = listed_date
 
-# get listings together with tag name
+    def __eq__(self, other):
+        return self.listing_name == other.listing_name and self.owner_id == other.owner_id
+
+
+# get listings together with their tags
 def get_listings_with_tags(owner_id):
     rows = listing_queries.get_listings_with_tags(owner_id)
     if rows is None:
         return None
-    return [ListingWithTagName(**row) for row in rows]
+    else:
+        pre = [ListingWithTagName(**row) for row in rows]
+        after = []
+        for i, elem in enumerate(pre):
+            if elem not in after:
+                after.append(elem)
+            else:
+                x = after.index(elem)
+                after[x].tag_name += "," + elem.tag_name
+        return after

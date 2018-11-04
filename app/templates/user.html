@@ -11,7 +11,13 @@
             <div id="listings" class="col-md-8 list-group">
                 {% for listing in available %}
                     <a href="{{ url_for('listing_details', listing_name=listing.listing_name, owner_id=listing.owner_id) }}" class="list-group-item">
-                        Name: {{ listing.listing_name }}, Tag: {{ listing.tag_name }}</a>
+                        {{ listing.listing_name }}
+                        {% if listing.tag_name != None %}
+                        {% for x in listing.tag_name.split(',') %}
+                            <span class="badge badge-primary badge-pill">{{ x }}</span>
+                        {% endfor %}
+                        {% endif%}
+                    </a>
                 {% endfor %}
             </div>
 

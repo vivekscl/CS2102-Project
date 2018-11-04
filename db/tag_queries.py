@@ -54,11 +54,26 @@ def get_listings_by_tag_name(tag_name):
                        '(SELECT listing_id FROM listing_tag WHERE tag_id = (SELECT tag_id FROM tag WHERE name = %s));', (tag_name,))
         return cursor.fetchall()
 
+
 def insert_listing_tag(tag_id, listing_name, owner_id):
     try:
         with DatabaseCursor() as cursor:
             cursor.execute('INSERT INTO listing_tag VALUES(%s, %s, %s);', (tag_id, listing_name, owner_id))
             return True
     except psycopg2.IntegrityError:
-        current_app.logger.error("listing_tag insertion failed: [{}]".format(tag_id))
+        current_app.logger.error("listing_tag insertion failed: [{}]".format(listing_name))
         return False
+
+
+def get_tagids_under_listing(listing_name, owner_id):
+    with DatabaseCursor() as cursor:
+        sql = ('''select tag_id, listing_name, owner_id from listing_tag group by listing_name, tag_id, owner_id
+                  having listing_name like '%{}%' and owner_id = {}''').format(listing_name, owner_id)
+        cursor.execute(sql)
+        return cursor.fetchall()
+
+
+def delete_listing_tags(listing_name, owner_id):
+    with DatabaseCursor() as cursor:
+        current_app.logger.info("Deleting tags for listing '{}' from listing_tag table.".format(listing_name))
+        cursor.execute('delete from listing_tag where listing_name = %s and owner_id = %s', (listing_name, owner_id))
