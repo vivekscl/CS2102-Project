@@ -140,6 +140,14 @@ def search_results(type, query):
         flash('No results found!')
 
     return render_template('search_results.html', listing=listing)
+
+
+@app.route('/user_profile/<string:username>', methods=['GET'])
+def user_profile(username):
+    listing = listing_model.get_listings_by_owner_name(username)
+    user = user_model.get_user_by_username(username)
+    most_common_tag = listing_tag_model.get_most_common_tag_of_owner(username)
+    return render_template('user_profile.html', user=user, listing=listing, most_common_tag=most_common_tag)
     
 
 @app.route('/listing/create', methods=['GET', 'POST'])

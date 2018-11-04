@@ -2,15 +2,34 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 {% block page_content %}
-{% include "search_bar.html" %}
-
 <div class="page-header">
-    <h1>Search Results</h1>
-    {% if listing is defined and listing|length > 0 %}
-        <p>About {{ listing|length }} results. Showing the latest first.</p>
-    {% endif %}
+    <h1>User Profile</h1>
 </div>
 
+{% if user is defined %}
+    <div class="media">
+      <div class="media-left">
+          <img class="media-object" src="https://via.placeholder.com/350x150" alt="placeholder">
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading">{{ user.name.capitalize() }}</h3>
+          <div><br>
+              <p>Username: {{ user.username }}</p>
+              <p>Email: {{ user.email }}</p>
+              <p>Total number of listings: {{ listing|length }}</p>
+              <p>
+                  Most commonly used tag: <span class="label label-primary">{{ most_common_tag.tag_name }}
+              </span></p>
+          </div>
+      </div>
+    </div>
+{% else %}
+    <h2>User doesn't exist.</h2>
+{% endif %}
+
+<div class="page-header">
+    <h1>Listings</h1>
+</div>
 <div>
     {% if listing is defined and listing|length > 0 %}
         {% for listing in listing %}
@@ -33,10 +52,7 @@
                         {% endif %}
                     </div>
                     <div class="panel-footer">
-                        Posted on: {{ moment(listing.listed_date).format('LLL') }} | Owned by:
-                        <a href="{{ url_for('user_profile', username=listing.username) }}">
-                            {{ listing.user_name }}
-                        </a>
+                        Posted on: {{ moment(listing.listed_date).format('LLL') }}
                     </div>
                 </div>
             </div>
@@ -45,8 +61,5 @@
         <h2>There are no available listings at the moment.</h2>
     {% endif %}
 </div>
-
-
-
 
 {% endblock %}

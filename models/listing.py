@@ -92,13 +92,14 @@ def get_listings_with_tags(owner_id):
 
 
 class ListingForSearch:
-    def __init__(self, listing_name, user_name, description, listed_date, tag_name, owner_id):
+    def __init__(self, listing_name, user_name, description, listed_date, tag_name, owner_id, username):
         self.listing_name = listing_name
         self.owner_id = owner_id
         self.description = description
         self.tag_name = tag_name
         self.listed_date = listed_date
         self.user_name = user_name
+        self.username = username
 
     def __eq__(self, other):
         return self.listing_name == other.listing_name and self.owner_id == other.owner_id
