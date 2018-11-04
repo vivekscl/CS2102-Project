@@ -16,6 +16,18 @@ class ListingTag:
         return tag_queries.insert_listing_tag(self.tag_id, self.listing_name, self.owner_id)
 
 
+def get_tagids_under_listing(listing_name, owner_id):
+    rows = tag_queries.get_tagids_under_listing(listing_name, owner_id)
+    if rows is None:
+        return None
+    else:
+        result = []
+        for row in rows:
+            print(row[0])
+            result.append(row[0])
+    return result
 
 
+def delete_listing_tags(listing_name, owner_id):
+    tag_queries.delete_listing_tags(listing_name, owner_id)
 

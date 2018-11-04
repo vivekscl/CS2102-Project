@@ -33,18 +33,15 @@ def insert_listing(listing_name, owner_id, description, listed_date, is_availabl
         return False
 
 
-def update_listing(listing_name, owner_id, description, listed_date, is_available=True):
+def update_listing(listing_name, owner_id, description):
     try:
         with DatabaseCursor() as cursor:
-            cursor.execute('UPDATE listing SET listed_date = %s, description = %s, is_available = %s '
-                           'where listing_name = %s and owner_id = %s;',
-                           (listed_date, description, is_available, listing_name, owner_id))
-            current_app.logger.info("Listing {} updated: [{}, {}, {}, {}]"
-                                    .format(listing_name, description, is_available, listed_date, owner_id))
+            cursor.execute('UPDATE listing SET description = %s  where listing_name = %s and owner_id = %s;',
+                           (description, listing_name, owner_id))
+            current_app.logger.info("Listing ('{}') updated.".format(listing_name))
             return True
-    except psycopg2.Error:
-        current_app.logger.error("UPDATE FAILED: [{}, {}, {}, {}, {}]".format(listed_date, description, is_available,
-                                                                              listing_name, owner_id))
+    except (Exception, psycopg2.DatabaseError) as error:
+        current_app.logger.error("Listing update failed: [{}]".format(error))
         return False
 
 
@@ -93,7 +90,8 @@ def get_expensive_listings():
 def get_listings_with_tags(owner_id):
     with DatabaseCursor() as cursor:
         cursor.execute('''select l.listing_name, l.owner_id, l.description, lt.tag_id, tag.name AS tag_name,
-                        l.is_available, l.listed_date from listing l inner join listing_tag lt on l.listing_name = lt.listing_name
-                        and l.owner_id = lt.owner_id inner join tag tag on lt.tag_id = tag.tag_id 
-                        and l.owner_id = %s''', (owner_id,))
+                         l.is_available, l.listed_date from listing l left join listing_tag lt on l.listing_name = lt.listing_name
+                         and l.owner_id = lt.owner_id left join tag tag on lt.tag_id = tag.tag_id and l.owner_id = %s
+                         group by l.listing_name, l.owner_id, lt.tag_id, tag.name
+                         order by l.listing_name asc, l.owner_id asc''', (owner_id,))
         return cursor.fetchall()
