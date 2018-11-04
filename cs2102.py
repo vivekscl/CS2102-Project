@@ -130,7 +130,7 @@ def search_results(type, query):
                                 query='%' + request.form.get('search_query') + '%'))
     if type == 'all':
         listing = listing_model.get_listings_by_all(query)
-    elif type == 'item':
+    elif type == 'listing':
         listing = listing_model.get_listings_by_listing_name(query)
     elif type == 'tag':
         listing = listing_model.get_listings_by_tag_name(query)
