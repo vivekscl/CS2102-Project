@@ -45,10 +45,10 @@ def update_listing(listing_name, owner_id, description):
         return False
 
 
-def delete_listing(listing_id):
+def delete_listing(listing_name, owner_id):
     with DatabaseCursor() as cursor:
-        current_app.logger.info("Deleting listing {} from database".format(listing_id))
-        cursor.execute("delete from listing where listing_id = %s", (listing_id,))
+        current_app.logger.info("Deleting listing {} {} from database".format(listing_name, owner_id))
+        cursor.execute("delete from listing where listing_name = %s and owner_id = %s", (listing_name, owner_id))
 
 
 def get_listings_under_owner(owner_id):
