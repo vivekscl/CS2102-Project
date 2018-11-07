@@ -12,15 +12,15 @@ class ItemForm(FlaskForm):
     1. The type of field
     2. The parameters for that field which are the label and validators if any
     """
-    tags = tag.get_all_tags()
-    data_source = []
-    for tag in tags:
-        tuple = (tag.tag_id, tag.name)
-        data_source.append(tuple)
+    # tags = tag.get_all_tags()
+    # data_source = []
+    # for tag in tags:
+    #     tuple = (tag.tag_id, tag.name)
+    #     data_source.append(tuple)
 
     item_name = StringField("Item Name: ", validators=[DataRequired()])
     description = StringField("Description: ", validators=[DataRequired()])
-    tags = SelectMultipleField("Choose the most appropriate tags: ", choices=data_source, coerce=int, validators=[Optional()])
+    # tags = SelectMultipleField("Choose the most appropriate tags: ", choices=data_source, coerce=int, validators=[Optional()])
     image = FileField("Item Image: ", validators=[Optional()])
     submit = SubmitField("Submit")
 
