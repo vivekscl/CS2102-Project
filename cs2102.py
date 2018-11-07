@@ -1,7 +1,8 @@
 import os
 from app import create_app, ItemForm, LoginForm, SignUpForm, EditProfileForm, BidForm, GenerateLoanForm, login_manager
 from flask_login import login_required, logout_user, login_user, current_user
-from models import user as user_model, listing as listing_model, bid as bid_model, loan as loan_model, tag as tag_model, listing_tag as listing_tag_model
+from models import user as user_model, listing as listing_model, bid as bid_model, loan as loan_model, listing_tag as \
+    listing_tag_model
 from werkzeug.security import generate_password_hash
 from flask import render_template, redirect, url_for, g, flash, request
 from datetime import datetime
@@ -113,8 +114,6 @@ def index():
     popular_listings = listing_model.get_popular_listings()
 
     if request.method == 'POST':
-        #print 'search type: ' + request.form.get('search_param')
-        #print 'search query: ' + request.form.get('search_query')
         return redirect(url_for('search_results', type=request.form.get('search_param'),
                                 query='%' + request.form.get('search_query') + '%'))
 
@@ -202,6 +201,7 @@ def create_listing():
 
 
 @app.route('/listing/<string:listing_name>/<int:owner_id>/edit', methods=['POST'])
+@login_required
 def edit_listing(listing_name, owner_id):
 
     if request.method == 'POST':
@@ -223,6 +223,20 @@ def edit_listing(listing_name, owner_id):
 
         flash("Update went wrong.", "error")
         return redirect(url_for('listing_details', listing_name=listing_name, owner_id=owner_id))
+
+
+@app.route('/bid/<int:bidder_id>/<string:listing_name>/<int:owner_id>/delete', methods=['POST'])
+@login_required
+def delete_bid(bidder_id, listing_name, owner_id):
+    bid_model.delete_bid(bidder_id, listing_name, owner_id)
+    return redirect(url_for('listing_details', listing_name=listing_name, owner_id=owner_id))
+
+
+@app.route('/listing/<string:listing_name>/<int:owner_id>/delete', methods=['POST'])
+@login_required
+def delete_listing(listing_name, owner_id):
+    listing_model.delete_listing(listing_name, owner_id)
+    return redirect(url_for('index'))
 
 
 @app.route('/listing/<string:listing_name>/<int:owner_id>', methods=['GET', 'POST'])
@@ -255,7 +269,7 @@ def listing_details(listing_name, owner_id):
             if new_bid.create_bid():
                 flash("Your bid has been placed", "success")
             else:
-                flash("Placing of bid has failed", "error")
+                flash("You either own this item or have already bid for this item", "error")
 
         return redirect(url_for('listing_details', listing_name=listing_name, owner_id=owner_id))
     return render_template('listing.html', listing=listing, tag_ids=tag_ids, bids_under_this_listing=bids,

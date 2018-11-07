@@ -33,8 +33,13 @@ def insert_bid(bidder_id, listing_name, owner_id, bid_date, price):
                                                                            price))
             current_app.logger.info("Bid added to database: [{}, {}, {}, {}, {}]"
                                     .format(bidder_id, listing_name, owner_id, bid_date, price))
+
             return True
     except psycopg2.IntegrityError:
+        current_app.logger.error("INSERTION FAILED: [{}, {}, {}, {}, {}]".format(bidder_id, listing_name, owner_id,
+                                                                                 bid_date, price))
+        return False
+    except psycopg2.InternalError as e:
         current_app.logger.error("INSERTION FAILED: [{}, {}, {}, {}, {}]".format(bidder_id, listing_name, owner_id,
                                                                                  bid_date, price))
         return False
@@ -53,4 +58,12 @@ def update_bid(bidder_id, listing_name, owner_id, bid_date, price):
         current_app.logger.error("UPDATE FAILED: [{}, {}, {}, {}, {}]".format(bidder_id, listing_name, owner_id,
                                                                               bid_date, price))
         return False
+
+
+def delete_bid(bidder_id, listing_name, owner_id):
+    with DatabaseCursor() as cursor:
+        current_app.logger.info("Deleting bid {} of listing {} and owner {} from database"
+                                .format(bidder_id, listing_name, owner_id))
+        cursor.execute("delete from bid where bidder_id = %s and listing_name = %s and owner_id = %s",
+                       (bidder_id, listing_name, owner_id))
 

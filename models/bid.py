@@ -45,6 +45,10 @@ def get_bid_under_listing_and_bidder(bidder_id, listing_name, owner_id,):
     return Bid(**row)
 
 
+def delete_bid(bidder_id, listing_name, owner_id):
+    bid_queries.delete_bid(bidder_id, listing_name, owner_id)
+
+
 def dict_list_to_bid_list(rows):
     if rows is None:
         return None
