@@ -23,13 +23,24 @@
 
             <div id="loans" class="col-md-8 list-group" style="display:none">
                 {% for listing in loans %}
-                    <a class="list-group-item">Name: {{ listing.listing_name }}</a>
+                    <a href="{{ url_for('loan_details', listing_name=listing.listing_name, owner_id=listing.owner_id) }}"
+                       class="list-group-item">Name: {{ listing.listing_name }}</a>
+                {% endfor %}
+            </div>
+
+            <div id="bids" class="col-md-8 list-group" style="display:none">
+                {% for bid in bids %}
+                    <a href="{{ url_for('listing_details', listing_name=bid.listing_name, owner_id=bid.owner_id) }}"
+                       class="list-group-item">
+                        Name: {{ bid.listing_name }}    Bid-Price: {{ bid.price }}
+                    </a>
                 {% endfor %}
             </div>
 
             <div class="col-md-4 btn-toolbar-vertical">
                 <button id="listing_btn" type="button" class="btn btn-default btn-lg btn-block">My Listings</button>
                 <button id="loan_btn" type="button" class="btn btn-default btn-lg btn-block">My Loans</button>
+                <button id="bid_btn" type="button" class="btn btn-default btn-lg btn-block">My Bids</button>
                 <button type="button" class="btn btn-default btn-lg btn-block"
                         onclick="window.location.href='{{ url_for('create_listing') }}';">Add New Listing
                 </button>
@@ -52,11 +63,32 @@
         </div>
     </div>
 
-{% endblock %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript">
+    $('#loan_btn').click(function() {
+        $('#loans').css('display', 'block');
+        $('#sub-content').css('display', 'none');
+        $('#title1').text('Current Loans');
+        $('#listings').css('display', 'none');
+        $('#bids').css('display', 'none');
+ });
+    $("#listing_btn").click(function() {
+        $('#listings').css('display', 'block');
+        $('#sub-content').css('display', 'block');
+        $('#title1').text('Available For Bidding');
+        $('#loans').css('display', 'none')
+        $('#bids').css('display', 'none');
+ });
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script type="javascript">
-    $("#loan_btn").click(function() {
-        $("#loans").toggle();
+    $("#bid_btn").click(function() {
+        $('#bids').css('display', 'block');
+        $('#sub-content').css('display', 'none');
+        $('#title1').text('My Bids');
+        $('#loans').css('display', 'none')
+        $('#listings').css('display', 'none');
     });
 </script>
+
+
+{% endblock %}
+
