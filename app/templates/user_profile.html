@@ -6,7 +6,7 @@
     <h1>User Profile</h1>
 </div>
 
-{% if user is defined %}
+{% if user %}
     <div class="media">
       <div class="media-left">
           <img class="media-object" src="https://via.placeholder.com/350x150" alt="placeholder">
@@ -23,9 +23,6 @@
           </div>
       </div>
     </div>
-{% else %}
-    <h2>User doesn't exist.</h2>
-{% endif %}
 
 <div class="page-header">
     <h1>Listings</h1>
@@ -61,5 +58,8 @@
         <h2>There are no available listings at the moment.</h2>
     {% endif %}
 </div>
+{% else %}
+    <h2>User doesn't exist.</h2>
+{% endif %}
 
 {% endblock %}
