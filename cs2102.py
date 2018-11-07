@@ -94,6 +94,8 @@ def register():
 def user_page():
     listings = listing_model.get_listings_with_tags(current_user.id)
     loans = loan_model.get_loans_under_bidder(current_user.id)
+    bids = bid_model.get_bids_under_bidder(current_user.id)
+
     available = []
     not_available = []
 
@@ -102,7 +104,7 @@ def user_page():
             available.append(listing)
         else:
             not_available.append(listing)
-    return render_template('user.html', available=available, not_available=not_available, loans=loans)
+    return render_template('user.html', available=available, not_available=not_available, loans=loans, bids=bids)
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -221,8 +223,6 @@ def edit_listing(listing_name, owner_id):
 
         flash("Update went wrong.", "error")
         return redirect(url_for('listing_details', listing_name=listing_name, owner_id=owner_id))
-
-
 
 
 @app.route('/listing/<string:listing_name>/<int:owner_id>', methods=['GET', 'POST'])
