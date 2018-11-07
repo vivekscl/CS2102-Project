@@ -255,7 +255,7 @@ def listing_details(listing_name, owner_id):
             if new_bid.create_bid():
                 flash("Your bid has been placed", "success")
             else:
-                flash("Placing of bid has failed", "error")
+                flash("You either own this item or have already bid for this item", "error")
 
         return redirect(url_for('listing_details', listing_name=listing_name, owner_id=owner_id))
     return render_template('listing.html', listing=listing, tag_ids=tag_ids, bids_under_this_listing=bids,
