@@ -91,7 +91,7 @@ CREATE TRIGGER on_loan_remove
 
 CREATE OR REPLACE FUNCTION stop_insertion() RETURNS TRIGGER AS $$
     BEGIN
-        RAISE NOTICE 'You cannot bid for your own item!';
+        RAISE EXCEPTION 'You cannot bid for your own item!';
         RETURN NULL;
     END; $$
 LANGUAGE plpgsql;
@@ -102,3 +102,34 @@ CREATE TRIGGER on_bid_insert
     FOR EACH ROW
     WHEN (NEW.bidder_id = NEW.owner_id)
     EXECUTE PROCEDURE stop_insertion();
+
+CREATE OR REPLACE FUNCTION prevent_bid_twice() RETURNS TRIGGER AS $$
+   BEGIN
+      IF (select count(*) from bid where bid.bidder_id=NEW.bidder_id
+     and bid.listing_name=NEW.listing_name  and bid.owner_id=NEW.owner_id) > 0 THEN
+    RAISE EXCEPTION 'You have already bid for that item!';
+    RETURN NULL;
+    END IF;
+    RETURN NEW;
+   END; $$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER on_owner_bid_twice
+   BEFORE INSERT
+   ON bid
+   FOR EACH ROW
+   EXECUTE PROCEDURE prevent_bid_twice();
+
+-- Pre fill in tag data. This data is fixed and will not be changed
+INSERT INTO tag VALUES (1, 'Electronics');
+INSERT INTO tag VALUES (2, 'Decor');
+INSERT INTO tag VALUES (3, 'Stationery');
+INSERT INTO tag VALUES (4, 'Tools & Applianc');
+INSERT INTO tag VALUES (5, 'Sports');
+INSERT INTO tag VALUES (6, 'Book');
+INSERT INTO tag VALUES (7, 'Collectibles');
+INSERT INTO tag VALUES (8, 'Game');
+INSERT INTO tag VALUES (9, 'Movie');
+INSERT INTO tag VALUES (10, 'Music');
+INSERT INTO tag VALUES (11, 'Programming');
+INSERT INTO tag VALUES (12, 'Outdoors');

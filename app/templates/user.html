@@ -21,19 +21,34 @@
                 {% endfor %}
             </div>
 
-            <div id="loans" class="col-md-8 list-group" style="display:none">
-                {% for listing in loans %}
-                    <a href="{{ url_for('loan_details', listing_name=listing.listing_name, owner_id=listing.owner_id) }}"
-                       class="list-group-item">Name: {{ listing.listing_name }}</a>
+            <div id="loans" class="col-md-8" style="display:none;">
+                {% for loan in loans %}
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">{{ loan.listing_name }}</h4>
+                        <p class="card-text">
+                            Borrowed on: {{ moment(loan.borrow_date).format('D MMM YYYY') }} <br />
+                            Expected to return on: {{ moment(loan.return_date).format('D MMM YYYY') }} <br />
+                            Return location: {{ loan.return_loc }} <br />
+                        </p>
+                    </div>
+                </div>
                 {% endfor %}
             </div>
 
             <div id="bids" class="col-md-8 list-group" style="display:none">
                 {% for bid in bids %}
-                    <a href="{{ url_for('listing_details', listing_name=bid.listing_name, owner_id=bid.owner_id) }}"
-                       class="list-group-item">
-                        Name: {{ bid.listing_name }}    Bid-Price: {{ bid.price }}
-                    </a>
+                        {% if get_listing_to_description(bid.listing_name, bid.owner_id) == 'true' %}
+                            <a href="{{ url_for('listing_details', listing_name=bid.listing_name, owner_id=bid.owner_id) }}"
+                               class="list-group-item">
+                                Name: {{ bid.listing_name }} | Bid-Price: {{ bid.price }}
+                            </a>
+                        {% else %}
+                            <a href="#"
+                               class="list-group-item disabled">
+                                Name: {{ bid.listing_name }} | Bid-Price: {{ bid.price }}
+                            </a>
+                    {% endif %}
                 {% endfor %}
             </div>
 
@@ -54,16 +69,21 @@
             <div class="row">
                 <div class="col-md-8 list-group">
                     {% for listing in not_available %}
-                        <a href="{{ url_for('loan_details', listing_name=listing.listing_name, owner_id=listing.owner_id) }}"
-                           class="list-group-item">
-                            Name: {{ listing.listing_name }}, Tag: Book</a>
+                        <a href="{{ url_for('loan_details', listing_name=listing.listing_name, owner_id=listing.owner_id) }}" class="list-group-item">
+                            {{ listing.listing_name }}
+                            {% if listing.tag_name != None %}
+                            {% for x in listing.tag_name.split(',') %}
+                                <span class="badge badge-primary badge-pill">{{ x }}</span>
+                            {% endfor %}
+                            {% endif%}
+                        </a>
                     {% endfor %}
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script type="text/javascript">
     $('#loan_btn').click(function() {
         $('#loans').css('display', 'block');
@@ -88,7 +108,4 @@
         $('#listings').css('display', 'none');
     });
 </script>
-
-
 {% endblock %}
-

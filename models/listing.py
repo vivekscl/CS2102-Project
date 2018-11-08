@@ -69,6 +69,9 @@ def get_popular_listings():
     return listing_queries.get_popular_listings()
 
 
+def delete_listing(listing_name, owner_id):
+    listing_queries.delete_listing(listing_name, owner_id)
+
 
 # Custom class for inner join query to return listing with tag name
 class ListingWithTagName:

@@ -33,15 +33,24 @@ def insert_user(username, email, name, password, phone_no=None):
         return False
 
 
-def update_user(username, email, name, password, phone_no=None):
+def update_user_info(username, name, email, phone_no=None):
     try:
         with DatabaseCursor() as cursor:
-            cursor.execute('UPDATE users SET username = %s, email = %s, name = %s, password_hash = %s, phone_no = %s',
-                           (username, email, name, password, phone_no))
+            cursor.execute('UPDATE users SET email = %s, name = %s, phone_no = %s WHERE username = %s', (email, name, phone_no, username))
             return True
     except psycopg2.IntegrityError:
         current_app.logger.info("UPDATE FAILED: [{}, {}, {}, {}, {}]".format(username, email, name, password, phone_no))
         return False
+
+
+def update_user_password(username, password):
+    try:
+        with DatabaseCursor() as cursor:
+            cursor.execute('UPDATE users SET password_hash = %s WHERE username = %s', (password, username))
+            return True
+    except (Exception, psycopg2.DatabaseError) as error:
+            current_app.logger.error("User password change failed: [{}]".format(error))
+            return False
 
 
 def retrieve_users():

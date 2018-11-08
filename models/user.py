@@ -16,13 +16,13 @@ class User(UserMixin):
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    def update_user_info(self, username, email, name, password_hash, phone_no):
+    def update_user_info(self, username, name, email, phone_no):
         """
         This method uses named arguments, all of which are optional. Send in an argument with the keyword name and
         this method will only update that part of the user.
         :return:
         """
-        user_queries.update_user(username, email, name, password_hash, phone_no)
+        user_queries.update_user_info(username, name, email, phone_no)
 
     def create_user(self):
         """
@@ -30,6 +30,13 @@ class User(UserMixin):
         :return:
         """
         user_queries.insert_user(self.username, self.email, self.name, self.password_hash, self.phone_no)
+
+    def change_password(self, new_password):
+        """
+        Changes the old user password to the new one
+        :return: true if update is successful, false otherwise
+        """
+        return user_queries.update_user_password(self.username, new_password)
 
 
 # Keep only update and insert queries inside the User class for the convenience of using the User attributes.

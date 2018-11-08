@@ -45,10 +45,10 @@ def update_listing(listing_name, owner_id, description):
         return False
 
 
-def delete_listing(listing_id):
+def delete_listing(listing_name, owner_id):
     with DatabaseCursor() as cursor:
-        current_app.logger.info("Deleting listing {} from database".format(listing_id))
-        cursor.execute("delete from listing where listing_id = %s", (listing_id,))
+        current_app.logger.info("Deleting listing {} {} from database".format(listing_name, owner_id))
+        cursor.execute("delete from listing where listing_name = %s and owner_id = %s", (listing_name, owner_id))
 
 
 def get_listings_under_owner(owner_id):
@@ -162,7 +162,7 @@ def get_listings_with_tags(owner_id):
     with DatabaseCursor() as cursor:
         cursor.execute('''select l.listing_name, l.owner_id, l.description, lt.tag_id, tag.name AS tag_name,
                          l.is_available, l.listed_date from listing l left join listing_tag lt on l.listing_name = lt.listing_name
-                         and l.owner_id = lt.owner_id left join tag tag on lt.tag_id = tag.tag_id and l.owner_id = %s
+                         and l.owner_id = lt.owner_id left join tag tag on lt.tag_id = tag.tag_id where l.owner_id = %s
                          group by l.listing_name, l.owner_id, lt.tag_id, tag.name
                          order by l.listing_name asc, l.owner_id asc''', (owner_id,))
         return cursor.fetchall()
