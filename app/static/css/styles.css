@@ -29,3 +29,8 @@
     margin-top: .5em;
     color: rgba(0, 0, 0, .68);
 }
+
+a.disable {
+  pointer-events: none;
+  cursor: default;
+}

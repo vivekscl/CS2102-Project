@@ -39,7 +39,7 @@ def insert_bid(bidder_id, listing_name, owner_id, bid_date, price):
         current_app.logger.error("INSERTION FAILED: [{}, {}, {}, {}, {}]".format(bidder_id, listing_name, owner_id,
                                                                                  bid_date, price))
         return False
-    except psycopg2.InternalError as e:
+    except psycopg2.InternalError:
         current_app.logger.error("INSERTION FAILED: [{}, {}, {}, {}, {}]".format(bidder_id, listing_name, owner_id,
                                                                                  bid_date, price))
         return False

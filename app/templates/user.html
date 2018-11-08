@@ -31,7 +31,6 @@
                             Expected to return on: {{ moment(loan.return_date).format('D MMM YYYY') }} <br />
                             Return location: {{ loan.return_loc }} <br />
                         </p>
-                        <a href="{{ url_for('listing_details', listing_name=loan.listing_name, owner_id=loan.owner_id) }}">View Listing Details</a>
                     </div>
                 </div>
                 {% endfor %}
@@ -39,10 +38,17 @@
 
             <div id="bids" class="col-md-8 list-group" style="display:none">
                 {% for bid in bids %}
-                <a href="{{ url_for('listing_details', listing_name=bid.listing_name, owner_id=bid.owner_id) }}"
-                   class="list-group-item">
-                    Name: {{ bid.listing_name }}    Bid-Price: {{ bid.price }}
-                </a>
+                        {% if get_listing_to_description(bid.listing_name, bid.owner_id) == 'true' %}
+                            <a href="{{ url_for('listing_details', listing_name=bid.listing_name, owner_id=bid.owner_id) }}"
+                               class="list-group-item">
+                                Name: {{ bid.listing_name }} | Bid-Price: {{ bid.price }}
+                            </a>
+                        {% else %}
+                            <a href="#"
+                               class="list-group-item disabled">
+                                Name: {{ bid.listing_name }} | Bid-Price: {{ bid.price }}
+                            </a>
+                    {% endif %}
                 {% endfor %}
             </div>
 
@@ -63,7 +69,7 @@
             <div class="row">
                 <div class="col-md-8 list-group">
                     {% for listing in not_available %}
-                        <a href="{{ url_for('listing_details', listing_name=listing.listing_name, owner_id=listing.owner_id) }}" class="list-group-item">
+                        <a href="{{ url_for('loan_details', listing_name=listing.listing_name, owner_id=listing.owner_id) }}" class="list-group-item">
                             {{ listing.listing_name }}
                             {% if listing.tag_name != None %}
                             {% for x in listing.tag_name.split(',') %}
