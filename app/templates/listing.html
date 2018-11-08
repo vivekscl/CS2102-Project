@@ -20,7 +20,7 @@
             data-target="#editListingModal" data-toggle="modal" href="#editListingModal">Edit Listing</a></button>
             <form class="pull-left" action="{{ url_for('delete_listing', listing_name=listing.listing_name,
             owner_id=owner.id) }}" method="post">
-                <button role="button" class="btn btn-danger">Remove</button>
+            <button role="button" class="btn btn-danger" style="margin-left:10px;">Remove Listing</button>
             </form>
         {% endif %}
       </div>
