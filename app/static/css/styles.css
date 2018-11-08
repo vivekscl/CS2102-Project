@@ -29,9 +29,3 @@
     margin-top: .5em;
     color: rgba(0, 0, 0, .68);
 }
-
-.divider {
-    width:5px;
-    height:auto;
-    display:inline-block;
-}
