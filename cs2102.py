@@ -36,9 +36,11 @@ def get_listing_to_description():
         return listing_model.get_listing(listing_name, owner_id).description
     return dict(get_listing_to_description=listing_description)
 
+
 @app.context_processor
-def get_listing_to_is_avail():
+def get_listing_is_avail():
     def listing_is_avail(listing_name, owner_id):
+        print(listing_model.get_listing(listing_name, owner_id).is_available)
         return listing_model.get_listing(listing_name, owner_id).is_available
     return dict(get_listing_is_avail=listing_is_avail)
 # ======================================== #

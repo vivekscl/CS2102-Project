@@ -38,14 +38,15 @@
 
             <div id="bids" class="col-md-8 list-group" style="display:none">
                 {% for bid in bids %}
-                        {% if get_listing_to_description(bid.listing_name, bid.owner_id) == 'true' %}
+                        {% if get_listing_is_avail(bid.listing_name, bid.owner_id) == 'true' %}
                             <a href="{{ url_for('listing_details', listing_name=bid.listing_name, owner_id=bid.owner_id) }}"
                                class="list-group-item">
                                 Name: {{ bid.listing_name }} | Bid-Price: {{ bid.price }}
                             </a>
                         {% else %}
                             <a href="#"
-                               class="list-group-item disabled">
+                               class="list-group-item disabled" data-toggle="tooltip" data-placement="bottom"
+                               title="This listing is not available at the moment">
                                 Name: {{ bid.listing_name }} | Bid-Price: {{ bid.price }}
                             </a>
                     {% endif %}
